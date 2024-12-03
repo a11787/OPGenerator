@@ -953,3 +953,61 @@
 2024-12-03 20:46:23,480 - INFO - 127.0.0.1 - - [03/Dec/2024 20:46:23] "GET /admin HTTP/1.1" 200 -
 2024-12-03 20:46:30,158 - INFO - 127.0.0.1 - - [03/Dec/2024 20:46:30] "GET / HTTP/1.1" 200 -
 2024-12-03 20:46:35,239 - INFO - 127.0.0.1 - - [03/Dec/2024 20:46:35] "GET /admin HTTP/1.1" 200 -
+2024-12-03 23:13:59,913 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 23:14:00,100 - INFO - Database initialized successfully with admin user
+2024-12-03 23:14:00,140 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-03 23:14:00,140 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-03 23:14:00,145 - INFO -  * Restarting with stat
+2024-12-03 23:14:00,397 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 23:14:00,523 - INFO - Database initialized successfully with admin user
+2024-12-03 23:14:00,529 - WARNING -  * Debugger is active!
+2024-12-03 23:14:00,529 - INFO -  * Debugger PIN: 273-169-323
+2024-12-03 23:14:08,946 - INFO - 127.0.0.1 - - [03/Dec/2024 23:14:08] "[32mGET / HTTP/1.1[0m" 302 -
+2024-12-03 23:14:09,243 - INFO - 127.0.0.1 - - [03/Dec/2024 23:14:09] "GET /login HTTP/1.1" 200 -
+2024-12-03 23:14:10,497 - INFO - 127.0.0.1 - - [03/Dec/2024 23:14:10] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2024-12-03 23:14:16,083 - INFO - User admin logged in from IP 127.0.0.1 and computer Unknown
+2024-12-03 23:14:16,099 - INFO - 127.0.0.1 - - [03/Dec/2024 23:14:16] "POST /login HTTP/1.1" 200 -
+2024-12-03 23:14:16,260 - INFO - 127.0.0.1 - - [03/Dec/2024 23:14:16] "GET /admin HTTP/1.1" 200 -
+2024-12-03 23:14:19,778 - INFO - 127.0.0.1 - - [03/Dec/2024 23:14:19] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-12-03 23:14:20,093 - INFO - 127.0.0.1 - - [03/Dec/2024 23:14:20] "GET /login HTTP/1.1" 200 -
+2024-12-03 23:14:25,935 - INFO - 127.0.0.1 - - [03/Dec/2024 23:14:25] "GET /signup HTTP/1.1" 200 -
+2024-12-03 23:14:34,506 - INFO - 127.0.0.1 - - [03/Dec/2024 23:14:34] "POST /signup HTTP/1.1" 200 -
+2024-12-03 23:14:36,553 - INFO - 127.0.0.1 - - [03/Dec/2024 23:14:36] "GET /login HTTP/1.1" 200 -
+2024-12-03 23:14:42,097 - INFO - User admin logged in from IP 127.0.0.1 and computer Unknown
+2024-12-03 23:14:42,097 - INFO - 127.0.0.1 - - [03/Dec/2024 23:14:42] "POST /login HTTP/1.1" 200 -
+2024-12-03 23:14:42,256 - INFO - 127.0.0.1 - - [03/Dec/2024 23:14:42] "GET /admin HTTP/1.1" 200 -
+2024-12-03 23:14:47,721 - INFO - 127.0.0.1 - - [03/Dec/2024 23:14:47] "POST /admin/user/haytham/approve HTTP/1.1" 200 -
+2024-12-03 23:14:48,051 - INFO - 127.0.0.1 - - [03/Dec/2024 23:14:48] "GET /admin HTTP/1.1" 200 -
+2024-12-03 23:14:57,964 - INFO - 127.0.0.1 - - [03/Dec/2024 23:14:57] "[32mGET / HTTP/1.1[0m" 302 -
+2024-12-03 23:14:57,979 - INFO - 127.0.0.1 - - [03/Dec/2024 23:14:57] "GET /login HTTP/1.1" 200 -
+2024-12-03 23:14:58,679 - INFO - 127.0.0.1 - - [03/Dec/2024 23:14:58] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2024-12-03 23:15:03,095 - INFO - User admin logged in from IP 127.0.0.1 and computer Unknown
+2024-12-03 23:15:03,095 - INFO - 127.0.0.1 - - [03/Dec/2024 23:15:03] "POST /login HTTP/1.1" 200 -
+2024-12-03 23:15:03,252 - INFO - 127.0.0.1 - - [03/Dec/2024 23:15:03] "GET /admin HTTP/1.1" 200 -
+2024-12-03 23:15:06,744 - INFO - 127.0.0.1 - - [03/Dec/2024 23:15:06] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-12-03 23:15:07,058 - INFO - 127.0.0.1 - - [03/Dec/2024 23:15:07] "GET /login HTTP/1.1" 200 -
+2024-12-03 23:15:14,260 - INFO - User haytham logged in from IP 127.0.0.1 and computer Unknown
+2024-12-03 23:15:14,272 - INFO - 127.0.0.1 - - [03/Dec/2024 23:15:14] "POST /login HTTP/1.1" 200 -
+2024-12-03 23:15:14,432 - INFO - 127.0.0.1 - - [03/Dec/2024 23:15:14] "GET / HTTP/1.1" 200 -
+2024-12-03 23:15:20,968 - INFO - 127.0.0.1 - - [03/Dec/2024 23:15:20] "GET /admin HTTP/1.1" 200 -
+2024-12-03 23:15:26,259 - INFO - 127.0.0.1 - - [03/Dec/2024 23:15:26] "GET /admin HTTP/1.1" 200 -
+2024-12-03 23:15:29,073 - INFO - 127.0.0.1 - - [03/Dec/2024 23:15:29] "GET /admin HTTP/1.1" 200 -
+2024-12-03 23:19:45,581 - INFO - 127.0.0.1 - - [03/Dec/2024 23:19:45] "POST /generate HTTP/1.1" 200 -
+2024-12-03 23:19:51,094 - INFO - 127.0.0.1 - - [03/Dec/2024 23:19:51] "GET /search?op_number=11 HTTP/1.1" 200 -
+2024-12-03 23:19:54,505 - INFO - 127.0.0.1 - - [03/Dec/2024 23:19:54] "GET /search?op_number=1 HTTP/1.1" 200 -
+2024-12-03 23:26:31,749 - INFO - 127.0.0.1 - - [03/Dec/2024 23:26:31] "GET / HTTP/1.1" 200 -
+2024-12-03 23:26:39,169 - INFO - 127.0.0.1 - - [03/Dec/2024 23:26:39] "GET /admin HTTP/1.1" 200 -
+2024-12-03 23:26:42,593 - INFO - 127.0.0.1 - - [03/Dec/2024 23:26:42] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-12-03 23:26:42,598 - INFO - 127.0.0.1 - - [03/Dec/2024 23:26:42] "GET /login HTTP/1.1" 200 -
+2024-12-03 23:26:49,992 - INFO - User haytham logged in from IP 127.0.0.1 and computer Unknown
+2024-12-03 23:26:49,992 - INFO - 127.0.0.1 - - [03/Dec/2024 23:26:49] "POST /login HTTP/1.1" 200 -
+2024-12-03 23:26:50,152 - INFO - 127.0.0.1 - - [03/Dec/2024 23:26:50] "GET / HTTP/1.1" 200 -
+2024-12-03 23:26:53,298 - INFO - 127.0.0.1 - - [03/Dec/2024 23:26:53] "GET /admin HTTP/1.1" 200 -
+2024-12-03 23:26:54,808 - INFO - 127.0.0.1 - - [03/Dec/2024 23:26:54] "GET /admin HTTP/1.1" 200 -
+2024-12-03 23:34:21,960 - INFO - 127.0.0.1 - - [03/Dec/2024 23:34:21] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-12-03 23:34:22,071 - INFO - 127.0.0.1 - - [03/Dec/2024 23:34:22] "GET /login HTTP/1.1" 200 -
+2024-12-03 23:34:27,567 - INFO - 127.0.0.1 - - [03/Dec/2024 23:34:27] "[31m[1mPOST /login HTTP/1.1[0m" 401 -
+2024-12-03 23:34:33,369 - INFO - User haytham logged in from IP 127.0.0.1 and computer Unknown
+2024-12-03 23:34:33,370 - INFO - 127.0.0.1 - - [03/Dec/2024 23:34:33] "POST /login HTTP/1.1" 200 -
+2024-12-03 23:34:33,533 - INFO - 127.0.0.1 - - [03/Dec/2024 23:34:33] "GET / HTTP/1.1" 200 -
