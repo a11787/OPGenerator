@@ -393,6 +393,9 @@ docs.register(RecordSearchResource)
 docs.register(TokenResource)
 docs.register(UserResource)
 
+def get_computer_name():
+    return request.headers.get('X-Computer-Name', 'Unknown')
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
@@ -438,6 +441,10 @@ def login():
         session['is_admin'] = bool(user[2])
         session['username'] = username
         session['full_name'] = user[3]
+        
+        ip_address = request.remote_addr
+        computer_name = get_computer_name()
+        logging.info(f"User {username} logged in from IP {ip_address} and computer {computer_name}")
         
         if request.is_json:
             return jsonify({'success': True, 'message': 'Login successful', 'is_admin': bool(user[2]), 'full_name': user[3]})
@@ -487,7 +494,7 @@ def generate():
         )
         existing_record = cursor.fetchone()
         
-        if existing_record:
+        if (existing_record):
             return jsonify({
                 'op_number': existing_record[0],
                 'message': 'Record already exists'
