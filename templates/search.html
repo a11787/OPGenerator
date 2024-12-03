@@ -1,0 +1,375 @@
+{% extends "base.html" %}
+
+{% block title %}Search OPs - OP Generator{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+    .search-filters {
+        background-color: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .search-results {
+        margin-top: 1.5rem;
+    }
+    .pagination-info {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    .status-badge {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.6rem;
+    }
+    .filter-section {
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+    }
+    .filter-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+    .filter-title {
+        color: #495057;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+    .search-field {
+        margin-bottom: 1rem;
+    }
+    .search-field label {
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    .table th {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+    }
+    .btn-export {
+        margin-left: 1rem;
+    }
+    .search-tips {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-top: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Advanced OP Search</h2>
+        <button class="btn btn-success" onclick="exportResults()">
+            <i class="fas fa-file-export"></i> Export Results
+        </button>
+    </div>
+    
+    <!-- Search Filters -->
+    <div class="search-filters">
+        <form id="searchForm">
+            <!-- OP Information -->
+            <div class="filter-section">
+                <h5 class="filter-title">OP Information</h5>
+                <div class="row">
+                    <div class="col-md-3 search-field">
+                        <label for="opNumber">OP Number</label>
+                        <input type="text" id="opNumber" class="form-control" placeholder="Enter OP number">
+                        <div class="search-tips">Partial numbers allowed (e.g., "123")</div>
+                    </div>
+                    <div class="col-md-3 search-field">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" class="form-control" placeholder="Enter name">
+                    </div>
+                    <div class="col-md-3 search-field">
+                        <label for="id1">ID 1</label>
+                        <input type="text" id="id1" class="form-control" placeholder="Enter ID 1">
+                    </div>
+                    <div class="col-md-3 search-field">
+                        <label for="id2">ID 2</label>
+                        <input type="text" id="id2" class="form-control" placeholder="Enter ID 2">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Date and Status -->
+            <div class="filter-section">
+                <h5 class="filter-title">Date and Status</h5>
+                <div class="row">
+                    <div class="col-md-3 search-field">
+                        <label for="dateFrom">Created From</label>
+                        <input type="text" id="dateFrom" class="form-control datepicker" placeholder="Start date">
+                    </div>
+                    <div class="col-md-3 search-field">
+                        <label for="dateTo">Created To</label>
+                        <input type="text" id="dateTo" class="form-control datepicker" placeholder="End date">
+                    </div>
+                    <div class="col-md-3 search-field">
+                        <label for="statusFilter">Status</label>
+                        <select id="statusFilter" class="form-select">
+                            <option value="">All Statuses</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 search-field">
+                        <label>&nbsp;</label>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sort Options -->
+            <div class="filter-section">
+                <h5 class="filter-title">Sort Options</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <select id="sortBy" class="form-select">
+                            <option value="created_at">Date Created</option>
+                            <option value="op_number">OP Number</option>
+                            <option value="name">Name</option>
+                            <option value="id1">ID 1</option>
+                            <option value="id2">ID 2</option>
+                            <option value="status">Status</option>
+                            <option value="username">Created By</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <select id="sortOrder" class="form-select">
+                            <option value="desc">Newest First</option>
+                            <option value="asc">Oldest First</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Results Section -->
+    <div class="search-results">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="pagination-info">
+                Showing <span id="startRecord">0</span> - <span id="endRecord">0</span> of <span id="totalRecords">0</span> records
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-outline-secondary btn-sm" onclick="toggleColumns('less')">Basic View</button>
+                <button class="btn btn-outline-secondary btn-sm" onclick="toggleColumns('more')">Detailed View</button>
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>OP Number</th>
+                        <th>Name</th>
+                        <th class="detail-column">ID 1</th>
+                        <th class="detail-column">ID 2</th>
+                        <th>Status</th>
+                        <th>Created By</th>
+                        <th>Created At</th>
+                        <th class="detail-column">Updated At</th>
+                        <th class="detail-column">Updated By</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="searchResults">
+                    <!-- Results will be populated here -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        <nav aria-label="Search results pages">
+            <ul class="pagination justify-content-center" id="pagination">
+                <!-- Pagination will be populated here -->
+            </ul>
+        </nav>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    // Initialize date pickers
+    flatpickr(".datepicker", {
+        dateFormat: "Y-m-d",
+        allowInput: true
+    });
+    
+    // Load status options
+    fetch('/api/statuses')
+        .then(response => response.json())
+        .then(data => {
+            const statusSelect = document.getElementById('statusFilter');
+            data.statuses.forEach(status => {
+                const option = document.createElement('option');
+                option.value = status;
+                option.textContent = status;
+                statusSelect.appendChild(option);
+            });
+        });
+    
+    // Search function
+    function performSearch(page = 1) {
+        const searchParams = new URLSearchParams({
+            op_number: document.getElementById('opNumber').value,
+            name: document.getElementById('name').value,
+            id1: document.getElementById('id1').value,
+            id2: document.getElementById('id2').value,
+            date_from: document.getElementById('dateFrom').value,
+            date_to: document.getElementById('dateTo').value,
+            status: document.getElementById('statusFilter').value,
+            sort_by: document.getElementById('sortBy').value,
+            sort_order: document.getElementById('sortOrder').value,
+            page: page,
+            per_page: 10
+        });
+        
+        fetch(`/search?${searchParams.toString()}`)
+            .then(response => response.json())
+            .then(data => {
+                updateResults(data.records);
+                updatePagination(data.pagination);
+            })
+            .catch(error => {
+                console.error('Search error:', error);
+                alert('An error occurred while searching');
+            });
+    }
+    
+    // Update results table
+    function updateResults(records) {
+        const tbody = document.getElementById('searchResults');
+        tbody.innerHTML = '';
+        
+        records.forEach(record => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${record.op_number}</td>
+                <td>${record.name || 'N/A'}</td>
+                <td class="detail-column">${record.id1 || 'N/A'}</td>
+                <td class="detail-column">${record.id2 || 'N/A'}</td>
+                <td><span class="badge status-badge bg-${getStatusColor(record.status)}">${record.status}</span></td>
+                <td>${record.created_by || 'N/A'}</td>
+                <td>${record.created_at}</td>
+                <td class="detail-column">${record.updated_at || 'N/A'}</td>
+                <td class="detail-column">${record.updated_by || 'N/A'}</td>
+                <td>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-primary" onclick="viewDetails(${record.op_number})" title="View Details">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-secondary" onclick="copyOpNumber(${record.op_number})" title="Copy OP Number">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+    
+    // Toggle column visibility
+    function toggleColumns(view) {
+        const detailColumns = document.querySelectorAll('.detail-column');
+        detailColumns.forEach(col => {
+            col.style.display = view === 'more' ? 'table-cell' : 'none';
+        });
+    }
+    
+    // Export results
+    function exportResults() {
+        const params = new URLSearchParams({
+            op_number: document.getElementById('opNumber').value,
+            name: document.getElementById('name').value,
+            id1: document.getElementById('id1').value,
+            id2: document.getElementById('id2').value,
+            date_from: document.getElementById('dateFrom').value,
+            date_to: document.getElementById('dateTo').value,
+            status: document.getElementById('statusFilter').value,
+            export: 'true'
+        });
+        
+        window.location.href = `/export?${params.toString()}`;
+    }
+    
+    // Copy OP number to clipboard
+    function copyOpNumber(opNumber) {
+        navigator.clipboard.writeText(opNumber.toString())
+            .then(() => {
+                alert('OP Number copied to clipboard!');
+            })
+            .catch(err => {
+                console.error('Failed to copy:', err);
+            });
+    }
+    
+    // Helper function to get status color
+    function getStatusColor(status) {
+        const statusColors = {
+            'Active': 'success',
+            'Pending': 'warning',
+            'Completed': 'info',
+            'Cancelled': 'danger'
+        };
+        return statusColors[status] || 'secondary';
+    }
+    
+    // Update pagination (same as before)
+    function updatePagination(pagination) {
+        const paginationElement = document.getElementById('pagination');
+        paginationElement.innerHTML = '';
+        
+        document.getElementById('startRecord').textContent = ((pagination.page - 1) * pagination.per_page) + 1;
+        document.getElementById('endRecord').textContent = Math.min(pagination.page * pagination.per_page, pagination.total_records);
+        document.getElementById('totalRecords').textContent = pagination.total_records;
+        
+        if (pagination.has_prev) {
+            paginationElement.innerHTML += `
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="performSearch(${pagination.page - 1})">Previous</a>
+                </li>
+            `;
+        }
+        
+        for (let i = Math.max(1, pagination.page - 2); i <= Math.min(pagination.total_pages, pagination.page + 2); i++) {
+            paginationElement.innerHTML += `
+                <li class="page-item ${i === pagination.page ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="performSearch(${i})">${i}</a>
+                </li>
+            `;
+        }
+        
+        if (pagination.has_next) {
+            paginationElement.innerHTML += `
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="performSearch(${pagination.page + 1})">Next</a>
+                </li>
+            `;
+        }
+    }
+    
+    // Event listeners
+    document.getElementById('searchForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        performSearch(1);
+    });
+    
+    // Auto-search on filter change
+    ['statusFilter', 'sortBy', 'sortOrder'].forEach(id => {
+        document.getElementById(id).addEventListener('change', () => performSearch(1));
+    });
+    
+    // Initialize with basic view
+    toggleColumns('less');
+    
+    // Initial search
+    performSearch(1);
+</script>
+{% endblock %}

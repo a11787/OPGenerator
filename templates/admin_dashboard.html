@@ -1,0 +1,382 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - OP Generator{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #4e73df;
+        --secondary-color: #858796;
+        --success-color: #1cc88a;
+        --warning-color: #f6c23e;
+        --danger-color: #e74a3b;
+        --info-color: #36b9cc;
+    }
+
+    .card {
+        margin-bottom: 20px;
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .stats-card {
+        background: linear-gradient(to right, var(--info-color), #2c9faf);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 15px;
+        margin-bottom: 1rem;
+    }
+
+    .stats-card h3 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .stats-card p {
+        margin: 0;
+        opacity: 0.8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="stats-card">
+                <h3>{{ stats.total_ops }}</h3>
+                <p>Total OPs Generated</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stats-card">
+                <h3>{{ stats.today_ops }}</h3>
+                <p>OPs Generated Today</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stats-card">
+                <h3>{{ stats.last_op }}</h3>
+                <p>Last OP Number</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Admin Dashboard</h1>
+        <a href="{{ url_for('view_sessions') }}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-history fa-sm text-white-50"></i> View User Sessions
+        </a>
+    </div>
+
+    <!-- User Sessions Table -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="card-title">Recent User Sessions</h3>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Computer Name</th>
+                            <th>IP Address</th>
+                            <th>Login Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for session in sessions %}
+                        <tr>
+                            <td>{{ session[0] }}</td>
+                            <td>{{ session[2] }}</td>
+                            <td>{{ session[1] }}</td>
+                            <td>{{ session[3].strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Management -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="card-title">User Management</h3>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Full Name</th>
+                            <th>Status</th>
+                            <th>Vacation</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.full_name }}</td>
+                            <td>
+                                {% if user.disabled %}
+                                    <span class="badge bg-danger">Disabled</span>
+                                {% elif not user.approved %}
+                                    <span class="badge bg-warning">Pending</span>
+                                {% else %}
+                                    <span class="badge bg-success">Active</span>
+                                {% endif %}
+                                {% if user.is_admin %}
+                                    <span class="badge bg-info">Admin</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user.vacation_start and user.vacation_end %}
+                                    <span class="badge bg-warning">{{ user.vacation_start.strftime('%Y-%m-%d') }} to {{ user.vacation_end.strftime('%Y-%m-%d') }}</span>
+                                    <button onclick="clearVacation('{{ user.username }}')" class="btn btn-sm btn-warning">Clear Vacation</button>
+                                {% else %}
+                                    <button onclick="showSetVacationModal('{{ user.username }}')" class="btn btn-sm btn-primary">Set Vacation</button>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if not user.approved %}
+                                <button onclick="approveUser('{{ user.username }}')" class="btn btn-sm btn-success">Approve</button>
+                                {% endif %}
+                                <button onclick="toggleAdmin('{{ user.username }}')" class="btn btn-sm btn-info">
+                                    {% if user.is_admin %}Remove Admin{% else %}Make Admin{% endif %}
+                                </button>
+                                <button onclick="toggleDisabled('{{ user.username }}')" class="btn btn-sm {% if user.disabled %}btn-warning{% else %}btn-danger{% endif %}">
+                                    {% if user.disabled %}Enable{% else %}Disable{% endif %}
+                                </button>
+                                <button onclick="deleteUser('{{ user.username }}')" class="btn btn-sm btn-danger">Delete</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Users -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="card-title">API Users</h3>
+        </div>
+        <div class="card-body">
+            <button class="btn btn-primary mb-3" onclick="showCreateApiUserModal()">Create API User</button>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for api_user in api_users %}
+                        <tr>
+                            <td>{{ api_user[0] }}</td>
+                            <td>
+                                <button onclick="regenerateToken('{{ api_user[0] }}')" class="btn btn-sm btn-warning">Regenerate Token</button>
+                                <button onclick="deleteApiUser('{{ api_user[0] }}')" class="btn btn-sm btn-danger">Delete</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create API User Modal -->
+<div class="modal fade" id="createApiUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create API User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createApiUserForm">
+                    <div class="mb-3">
+                        <label for="apiUsername" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="apiUsername" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="apiPassword" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="apiPassword" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="createApiUser()">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Vacation Modal -->
+<div class="modal fade" id="vacationModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Set Vacation Period</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="vacationForm">
+                    <input type="hidden" id="vacationUsername">
+                    <div class="mb-3">
+                        <label for="startDate" class="form-label">Start Date</label>
+                        <input type="date" class="form-control" id="startDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="endDate" class="form-label">End Date</label>
+                        <input type="date" class="form-control" id="endDate" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="setVacation()">Set Vacation</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function approveUser(username) {
+        fetch(`/admin/user/${username}/approve`, {
+            method: 'POST'
+        }).then(() => window.location.reload());
+    }
+
+    function toggleAdmin(username) {
+        fetch(`/admin/user/${username}/toggle-admin`, {
+            method: 'POST'
+        }).then(() => window.location.reload());
+    }
+
+    function toggleDisabled(username) {
+        fetch(`/admin/user/${username}/toggle-disabled`, {
+            method: 'POST'
+        }).then(() => window.location.reload());
+    }
+
+    function deleteUser(username) {
+        if (confirm(`Are you sure you want to delete user ${username}?`)) {
+            fetch(`/admin/user/${username}/delete`, {
+                method: 'POST'
+            }).then(() => window.location.reload());
+        }
+    }
+
+    function showCreateApiUserModal() {
+        new bootstrap.Modal(document.getElementById('createApiUserModal')).show();
+    }
+
+    function createApiUser() {
+        const username = document.getElementById('apiUsername').value;
+        const password = document.getElementById('apiPassword').value;
+        
+        fetch('/admin/api-user/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password })
+        }).then(() => window.location.reload());
+    }
+
+    function regenerateToken(username) {
+        fetch(`/admin/api-user/${username}/regenerate-token`, {
+            method: 'POST'
+        }).then(() => window.location.reload());
+    }
+
+    function deleteApiUser(username) {
+        if (confirm(`Are you sure you want to delete API user ${username}?`)) {
+            fetch(`/admin/api-user/${username}/delete`, {
+                method: 'POST'
+            }).then(() => window.location.reload());
+        }
+    }
+
+    let vacationModal;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        vacationModal = new bootstrap.Modal(document.getElementById('vacationModal'));
+    });
+
+    function showSetVacationModal(username) {
+        document.getElementById('vacationUsername').value = username;
+        vacationModal.show();
+    }
+
+    function setVacation() {
+        const username = document.getElementById('vacationUsername').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        if (!startDate || !endDate) {
+            alert('Please select both start and end dates');
+            return;
+        }
+
+        fetch(`/admin/user/${username}/set-vacation`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                start_date: startDate,
+                end_date: endDate
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                vacationModal.hide();
+                window.location.reload();
+            } else {
+                alert(data.error || 'Failed to set vacation period');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to set vacation period');
+        });
+    }
+
+    function clearVacation(username) {
+        if (confirm('Are you sure you want to clear the vacation period?')) {
+            fetch(`/admin/user/${username}/clear-vacation`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert(data.error || 'Failed to clear vacation period');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to clear vacation period');
+            });
+        }
+    }
+</script>
+{% endblock %}

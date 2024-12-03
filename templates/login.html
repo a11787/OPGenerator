@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - OP Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .login-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 1rem;
+        }
+        .login-header {
+            margin-bottom: 2rem;
+        }
+        .login-header i {
+            font-size: 3rem;
+            color: #007bff;
+            margin-bottom: 1rem;
+        }
+        .login-header h1 {
+            color: #333;
+            font-size: 1.8rem;
+            margin: 0;
+        }
+        .icon-input-container {
+            position: relative;
+        }
+        .icon-input-container i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+        .icon-input-container input {
+            padding-left: 2.8rem;
+        }
+        .btn-login {
+            width: 100%;
+            padding: 0.8rem;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+        }
+        .loading {
+            display: none;
+            margin-top: 1rem;
+            color: #007bff;
+            font-size: 1.5rem;
+        }
+        .alert {
+            display: none;
+            margin-bottom: 1rem;
+        }
+        .login-link {
+            margin-top: 1rem;
+            color: #6c757d;
+        }
+        .login-link a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .version {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <i class="fas fa-fingerprint"></i>
+                <h1>OP Generator</h1>
+            </div>
+            <div class="login-body">
+                <div class="alert alert-danger" id="errorAlert" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span id="errorMessage"></span>
+                </div>
+                <form id="loginForm">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <div class="icon-input-container">
+                            <i class="fas fa-user"></i>
+                            <input type="text" class="form-control" id="username" required>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="icon-input-container">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" class="form-control" id="password" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-login btn-primary">
+                        <i class="fas fa-sign-in-alt me-2"></i>Login
+                    </button>
+                </form>
+                <div class="loading" id="loginLoading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+                <div class="login-link">
+                    Don't have an account? <a href="/signup">Sign up here</a>
+                </div>
+            </div>
+        </div>
+        <div class="version">
+            Version 1.0.0
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const errorAlert = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
+            const loading = document.getElementById('loginLoading');
+            
+            errorAlert.style.display = 'none';
+            loading.style.display = 'block';
+            
+            const data = {
+                username: document.getElementById('username').value,
+                password: document.getElementById('password').value
+            };
+            
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Redirect based on user type
+                    window.location.href = result.is_admin ? '/admin' : '/';
+                } else {
+                    errorMessage.textContent = result.error || 'Login failed';
+                    errorAlert.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                errorMessage.textContent = 'An error occurred. Please try again.';
+                errorAlert.style.display = 'block';
+            } finally {
+                loading.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

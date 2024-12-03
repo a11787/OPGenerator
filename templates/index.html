@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OP Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #858796;
+            --success-color: #1cc88a;
+        }
+
+        body {
+            padding: 20px;
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar-brand {
+            color: var(--primary-color) !important;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .card {
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            background: linear-gradient(to right, var(--primary-color), #224abe);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 1rem 1.5rem;
+        }
+
+        .card-header h5 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e3e6f0;
+            transition: border-color 0.2s ease-in-out;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .btn-primary:hover {
+            background-color: #224abe;
+            transform: translateY(-1px);
+        }
+
+        .result-box {
+            background-color: #fff;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid var(--success-color);
+        }
+
+        .table {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .table thead th {
+            background-color: #f8f9fc;
+            border-bottom: 2px solid #e3e6f0;
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9fc;
+        }
+
+        .form-label {
+            color: var(--secondary-color);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .alert {
+            margin-top: 15px;
+            border-radius: 10px;
+        }
+
+        .icon-input-container {
+            position: relative;
+        }
+
+        .icon-input-container i {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            left: 1rem;
+            color: var(--secondary-color);
+        }
+
+        .icon-input-container input {
+            padding-left: 2.5rem;
+        }
+
+        #opNumber {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        #resultMessage {
+            color: var(--success-color);
+            font-weight: 500;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            color: var(--secondary-color);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .loading i {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white mb-4 shadow-sm rounded">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-fingerprint me-2"></i>
+                OP Generator
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="nav-item nav-link text-primary me-3">
+                    <i class="fas fa-user me-1"></i>
+                    {{ session.full_name }}
+                </span>
+                <a class="nav-link" href="/logout" style="color: var(--secondary-color);">
+                    <i class="fas fa-sign-out-alt me-1"></i>
+                    Sign Out
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Generate Section -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Generate OP Number</h5>
+            </div>
+            <div class="card-body">
+                <form id="generateForm">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="name" class="form-label">Name</label>
+                            <div class="icon-input-container">
+                                <i class="fas fa-user"></i>
+                                <input type="text" class="form-control" id="name" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="id1" class="form-label">ID1 (numbers only)</label>
+                            <div class="icon-input-container">
+                                <i class="fas fa-hashtag"></i>
+                                <input type="text" class="form-control" id="id1" pattern="[0-9]+" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="id2" class="form-label">ID2 (numbers only)</label>
+                            <div class="icon-input-container">
+                                <i class="fas fa-hashtag"></i>
+                                <input type="text" class="form-control" id="id2" pattern="[0-9]+" required>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-magic me-2"></i>Generate
+                    </button>
+                </form>
+                <div id="generatedNumber" class="result-box d-none">
+                    <h6><i class="fas fa-check-circle me-2"></i>Generated OP Number:</h6>
+                    <p class="mb-0 fw-bold" id="opNumber"></p>
+                    <p class="text-muted mb-0" id="resultMessage"></p>
+                </div>
+                <div class="loading" id="generateLoading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Section -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-search me-2"></i>Search Records</h5>
+            </div>
+            <div class="card-body">
+                <form id="searchForm">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label for="searchName" class="form-label">Name (Exact Match)</label>
+                            <div class="icon-input-container">
+                                <i class="fas fa-user"></i>
+                                <input type="text" class="form-control" id="searchName" placeholder="Enter exact name">
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="searchId1" class="form-label">ID1 (Exact Match)</label>
+                            <div class="icon-input-container">
+                                <i class="fas fa-hashtag"></i>
+                                <input type="text" class="form-control" id="searchId1" placeholder="Enter exact ID1">
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="searchId2" class="form-label">ID2 (Exact Match)</label>
+                            <div class="icon-input-container">
+                                <i class="fas fa-hashtag"></i>
+                                <input type="text" class="form-control" id="searchId2" placeholder="Enter exact ID2">
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="searchOpNumber" class="form-label">OP Number (Exact Match)</label>
+                            <div class="icon-input-container">
+                                <i class="fas fa-fingerprint"></i>
+                                <input type="number" class="form-control" id="searchOpNumber" placeholder="Enter exact OP Number">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="alert alert-info mb-3">
+                        <i class="fas fa-info-circle me-2"></i>
+                        All search criteria use exact matching and are combined with AND logic. Only records matching ALL provided criteria exactly will be shown.
+                    </div>
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i>Search
+                        </button>
+                        <button type="button" class="btn btn-secondary ms-2" id="resetSearchBtn">
+                            <i class="fas fa-undo me-2"></i>Reset
+                        </button>
+                    </div>
+                </form>
+                <div id="searchResults" class="result-box d-none">
+                    <h6><i class="fas fa-list me-2"></i>Search Results:</h6>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>ID1</th>
+                                    <th>ID2</th>
+                                    <th>OP Number</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="loading" id="searchLoading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add input validation for ID1 and ID2
+        ['id1', 'id2'].forEach(id => {
+            document.getElementById(id).addEventListener('input', (e) => {
+                if (e.target.value && !/^\d+$/.test(e.target.value)) {
+                    e.target.setCustomValidity('Please enter numbers only');
+                } else {
+                    e.target.setCustomValidity('');
+                }
+            });
+        });
+
+        document.getElementById('generateForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                name: document.getElementById('name').value,
+                id1: document.getElementById('id1').value,
+                id2: document.getElementById('id2').value
+            };
+
+            try {
+                document.getElementById('generateLoading').style.display = 'block';
+                document.getElementById('generatedNumber').classList.add('d-none');
+
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                if (response.ok) {
+                    document.getElementById('opNumber').textContent = result.op_number;
+                    document.getElementById('resultMessage').textContent = result.message;
+                    document.getElementById('generatedNumber').classList.remove('d-none');
+                    
+                    // Clear form if it's a new record
+                    if (result.message === 'New record created') {
+                        document.getElementById('generateForm').reset();
+                    }
+                } else {
+                    alert(result.error || 'An error occurred');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while generating the OP number. Please try again.');
+            } finally {
+                document.getElementById('generateLoading').style.display = 'none';
+            }
+        });
+
+        document.getElementById('searchForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const opNumberInput = document.getElementById('searchOpNumber').value.trim();
+            
+            // Validate OP Number if provided
+            if (opNumberInput && !Number.isInteger(Number(opNumberInput))) {
+                alert('OP Number must be a valid integer');
+                return;
+            }
+            
+            const data = {
+                name: document.getElementById('searchName').value.trim(),
+                id1: document.getElementById('searchId1').value.trim(),
+                id2: document.getElementById('searchId2').value.trim(),
+                op_number: opNumberInput || null
+            };
+
+            // Validate that at least one field is filled
+            if (!data.name && !data.id1 && !data.id2 && !data.op_number) {
+                alert('Please fill at least one search field');
+                return;
+            }
+
+            try {
+                document.getElementById('searchLoading').style.display = 'block';
+                document.getElementById('searchResults').classList.add('d-none');
+
+                const queryParams = new URLSearchParams();
+                if (data.name) queryParams.append('name', data.name);
+                if (data.id1) queryParams.append('id1', data.id1);
+                if (data.id2) queryParams.append('id2', data.id2);
+                if (data.op_number) queryParams.append('op_number', data.op_number);
+
+                const response = await fetch(`/search?${queryParams.toString()}`, {
+                    method: 'GET'
+                });
+                
+                const results = await response.json();
+                if (response.ok && results.success) {
+                    const tbody = document.getElementById('resultsBody');
+                    tbody.innerHTML = '';
+                    
+                    if (results.records.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="4" class="no-results"><i class="fas fa-info-circle me-2"></i>No records found</td></tr>';
+                    } else {
+                        results.records.forEach(record => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td><i class="fas fa-user me-2"></i>${record.name}</td>
+                                <td><i class="fas fa-hashtag me-2"></i>${record.id1}</td>
+                                <td><i class="fas fa-hashtag me-2"></i>${record.id2}</td>
+                                <td><i class="fas fa-fingerprint me-2"></i>${record.op_number}</td>
+                            `;
+                            tbody.appendChild(row);
+                        });
+                    }
+                    
+                    document.getElementById('searchResults').classList.remove('d-none');
+                } else {
+                    console.error('Search error:', results.error);
+                    alert(results.error || 'An error occurred during search');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while searching. Please try again.');
+            } finally {
+                document.getElementById('searchLoading').style.display = 'none';
+            }
+        });
+
+        // Add reset functionality
+        document.getElementById('resetSearchBtn').addEventListener('click', () => {
+            // Reset form fields
+            document.getElementById('searchForm').reset();
+            
+            // Hide results section
+            document.getElementById('searchResults').classList.add('d-none');
+            
+            // Clear results table
+            document.getElementById('resultsBody').innerHTML = '';
+        });
+    </script>
+</body>
+</html>

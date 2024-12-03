@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - OP Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #858796;
+            --success-color: #1cc88a;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f8f9fc 0%, #e8eaf6 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .signup-container {
+            width: 100%;
+            max-width: 500px;
+            padding: 2rem;
+        }
+
+        .signup-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            overflow: hidden;
+        }
+
+        .signup-header {
+            background: linear-gradient(to right, var(--primary-color), #224abe);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 0;
+        }
+
+        .signup-header i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .signup-header h1 {
+            font-size: 1.5rem;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .signup-body {
+            padding: 2rem;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e3e6f0;
+            transition: border-color 0.2s ease-in-out;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+        }
+
+        .btn-signup {
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .btn-signup:hover {
+            background-color: #224abe;
+            transform: translateY(-1px);
+        }
+
+        .icon-input-container {
+            position: relative;
+        }
+
+        .icon-input-container i {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            left: 1rem;
+            color: var(--secondary-color);
+        }
+
+        .icon-input-container input {
+            padding-left: 2.5rem;
+        }
+
+        .alert {
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .loading i {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+
+        .password-requirements {
+            font-size: 0.875rem;
+            color: var(--secondary-color);
+            margin-top: 0.5rem;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .login-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .version {
+            text-align: center;
+            color: var(--secondary-color);
+            margin-top: 1rem;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <div class="signup-card">
+            <div class="signup-header">
+                <i class="fas fa-user-plus"></i>
+                <h1>Create Account</h1>
+            </div>
+            <div class="signup-body">
+                <div class="alert alert-danger" id="errorAlert" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span id="errorMessage"></span>
+                </div>
+                <div class="alert alert-success" id="successAlert" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span id="successMessage"></span>
+                </div>
+                <form id="signupForm">
+                    <div class="mb-3">
+                        <label for="fullName" class="form-label">Full Name</label>
+                        <div class="icon-input-container">
+                            <i class="fas fa-user"></i>
+                            <input type="text" class="form-control" id="fullName" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <div class="icon-input-container">
+                            <i class="fas fa-at"></i>
+                            <input type="text" class="form-control" id="username" required>
+                        </div>
+                        <div class="password-requirements">
+                            Username must be at least 3 characters long
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="icon-input-container">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" class="form-control" id="password" required>
+                        </div>
+                        <div class="password-requirements">
+                            Password must be at least 8 characters long
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-signup btn-primary">
+                        <i class="fas fa-user-plus me-2"></i>Create Account
+                    </button>
+                </form>
+                <div class="loading" id="signupLoading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+                <div class="login-link">
+                    Already have an account? <a href="/login">Login here</a>
+                </div>
+            </div>
+        </div>
+        <div class="version">
+            Version 1.0.0
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const errorAlert = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
+            const successAlert = document.getElementById('successAlert');
+            const successMessage = document.getElementById('successMessage');
+            const loading = document.getElementById('signupLoading');
+            const form = document.getElementById('signupForm');
+            
+            // Reset alerts
+            errorAlert.style.display = 'none';
+            successAlert.style.display = 'none';
+            loading.style.display = 'block';
+            
+            const data = {
+                full_name: document.getElementById('fullName').value.trim(),
+                username: document.getElementById('username').value.trim(),
+                password: document.getElementById('password').value
+            };
+            
+            // Client-side validation
+            if (data.username.length < 3) {
+                errorMessage.textContent = 'Username must be at least 3 characters long';
+                errorAlert.style.display = 'block';
+                loading.style.display = 'none';
+                return;
+            }
+            
+            if (data.password.length < 8) {
+                errorMessage.textContent = 'Password must be at least 8 characters long';
+                errorAlert.style.display = 'block';
+                loading.style.display = 'none';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    successMessage.textContent = 'Account created successfully! Redirecting to login...';
+                    successAlert.style.display = 'block';
+                    form.reset();
+                    
+                    // Redirect to login page after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = '/login';
+                    }, 2000);
+                } else {
+                    errorMessage.textContent = result.error || 'An error occurred';
+                    errorAlert.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                errorMessage.textContent = 'An error occurred. Please try again.';
+                errorAlert.style.display = 'block';
+            } finally {
+                loading.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

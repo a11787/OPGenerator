@@ -1,0 +1,6 @@
+Flask==3.0.0
+pyodbc==4.0.34
+python-dotenv==1.0.0
+Werkzeug==3.0.1
+flask-restful==0.3.10
+flask-apispec==0.11.4

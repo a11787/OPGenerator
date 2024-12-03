@@ -1,0 +1,591 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - OP Generator{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #4e73df;
+        --secondary-color: #858796;
+        --success-color: #1cc88a;
+        --warning-color: #f6c23e;
+        --danger-color: #e74a3b;
+        --info-color: #36b9cc;
+    }
+
+    body {
+        padding: 20px;
+        background-color: #f8f9fa;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .card {
+        margin-bottom: 20px;
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+    }
+
+    .card-header {
+        background: linear-gradient(to right, var(--primary-color), #224abe);
+        color: white;
+        border-radius: 15px 15px 0 0 !important;
+        padding: 1rem 1.5rem;
+    }
+
+    .card-header h5 {
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .stats-card {
+        background: linear-gradient(to right, var(--info-color), #2c9faf);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 15px;
+        margin-bottom: 1rem;
+    }
+
+    .stats-card h3 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .stats-card p {
+        margin: 0;
+        opacity: 0.8;
+    }
+
+    .table {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .table thead th {
+        background-color: #f8f9fc;
+        border-bottom: 2px solid #e3e6f0;
+        color: var(--secondary-color);
+        font-weight: 600;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fc;
+    }
+
+    .btn {
+        border-radius: 10px;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .btn:hover {
+        transform: translateY(-1px);
+    }
+
+    .badge {
+        padding: 0.5rem 0.8rem;
+        border-radius: 8px;
+        font-weight: 500;
+    }
+
+    .badge.bg-success {
+        background-color: var(--success-color) !important;
+    }
+
+    .badge.bg-warning {
+        background-color: var(--warning-color) !important;
+    }
+
+    .badge.bg-primary {
+        background-color: var(--primary-color) !important;
+    }
+
+    .badge.bg-secondary {
+        background-color: var(--secondary-color) !important;
+    }
+
+    .badge.bg-danger {
+        background-color: var(--danger-color) !important;
+    }
+
+    .badge.bg-info {
+        background-color: var(--info-color) !important;
+    }
+
+    .user-actions .btn {
+        margin-right: 0.5rem;
+    }
+
+    .user-actions .btn:last-child {
+        margin-right: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="stats-card">
+                <h3>{{ stats.total_ops }}</h3>
+                <p>Total OPs Generated</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stats-card">
+                <h3>{{ stats.today_ops }}</h3>
+                <p>OPs Generated Today</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stats-card">
+                <h3>{{ stats.last_op }}</h3>
+                <p>Last OP Number</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Management -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-users me-2"></i>User Management
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Full Name</th>
+                            <th>Status</th>
+                            <th>Admin</th>
+                            <th>Vacation</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr data-username="{{ user.username }}">
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.full_name }}</td>
+                            <td>
+                                {% if not user.is_approved %}
+                                    <span class="badge bg-warning">Pending</span>
+                                {% elif user.is_disabled %}
+                                    <span class="badge bg-danger">Disabled</span>
+                                {% else %}
+                                    <span class="badge bg-success">Active</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user.is_admin %}
+                                    <span class="badge bg-primary">Yes</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">No</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user.vacation_start and user.vacation_end %}
+                                    <span class="badge bg-info">
+                                        {{ user.vacation_start.strftime('%Y-%m-%d') }} to {{ user.vacation_end.strftime('%Y-%m-%d') }}
+                                    </span>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="clearVacation('{{ user.username }}')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                {% else %}
+                                    <button class="btn btn-sm btn-outline-primary" onclick="showSetVacationModal('{{ user.username }}')">
+                                        <i class="fas fa-calendar-plus"></i> Set
+                                    </button>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if not user.is_approved %}
+                                    <button class="btn btn-success btn-sm" onclick="approveUser('{{ user.username }}')">
+                                        <i class="fas fa-check me-1"></i>Approve
+                                    </button>
+                                {% endif %}
+                                <button class="btn btn-warning btn-sm" onclick="toggleDisabled('{{ user.username }}', {{ user.is_disabled|tojson }})">
+                                    <i class="fas fa-user-shield me-1"></i>{{ 'Remove Admin' if user.is_admin else 'Make Admin' }}
+                                </button>
+                                <button class="btn {% if user.is_disabled %}btn-success{% else %}btn-danger{% endif %} btn-sm" onclick="toggleDisabled('{{ user.username }}', {{ user.is_disabled|tojson }})">
+                                    <i class="fas {% if user.is_disabled %}fa-user-check{% else %}fa-user-slash{% endif %} me-1"></i>
+                                    {{ 'Enable' if user.is_disabled else 'Disable' }}
+                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteUser('{{ user.username }}')">
+                                    <i class="fas fa-trash me-1"></i>Delete
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Users -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-key me-2"></i>API Users
+            </h5>
+        </div>
+        <div class="card-body">
+            <button class="btn btn-primary mb-3" onclick="showNewApiUserModal()">
+                <i class="fas fa-plus me-1"></i>Add API User
+            </button>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>API Token</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for api_user in api_users %}
+                        <tr>
+                            <td>{{ api_user.username }}</td>
+                            <td>
+                                <code>{{ api_user.token[:10] }}...</code>
+                            </td>
+                            <td class="user-actions">
+                                <button class="btn btn-warning btn-sm" onclick="regenerateToken('{{ api_user.username }}')">
+                                    <i class="fas fa-sync-alt me-1"></i>New Token
+                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteApiUser('{{ api_user.username }}')">
+                                    <i class="fas fa-trash me-1"></i>Delete
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New API User Modal -->
+<div class="modal fade" id="newApiUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New API User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newApiUserForm">
+                    <div class="mb-3">
+                        <label for="apiUsername" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="apiUsername" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="apiPassword" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="apiPassword" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="createApiUser()">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Vacation Modal -->
+<div class="modal fade" id="vacationModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Set Vacation Period</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="vacation-username">
+                <div class="mb-3">
+                    <label for="vacation-start" class="form-label">Start Date</label>
+                    <input type="date" class="form-control" id="vacation-start" required>
+                </div>
+                <div class="mb-3">
+                    <label for="vacation-end" class="form-label">End Date</label>
+                    <input type="date" class="form-control" id="vacation-end" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="setVacation()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function showNewApiUserModal() {
+        new bootstrap.Modal(document.getElementById('newApiUserModal')).show();
+    }
+
+    function approveUser(username) {
+        if (confirm('Are you sure you want to approve this user?')) {
+            fetch(`/admin/user/${username}/approve`, {
+                method: 'POST',
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      location.reload();
+                  } else {
+                      alert('Error approving user');
+                  }
+              });
+        }
+    }
+
+    function toggleAdmin(username, isCurrentlyAdmin) {
+        const action = isCurrentlyAdmin ? 'remove admin privileges from' : 'make admin';
+        if (confirm(`Are you sure you want to ${action} this user?`)) {
+            fetch(`/admin/user/${username}/toggle-admin`, {
+                method: 'POST',
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      location.reload();
+                  } else {
+                      alert(data.error || 'Error toggling admin status');
+                  }
+              });
+        }
+    }
+
+    function toggleDisabled(username, isCurrentlyDisabled) {
+        if (!confirm(`Are you sure you want to ${isCurrentlyDisabled ? 'enable' : 'disable'} user ${username}?`)) {
+            return;
+        }
+        
+        fetch(`/admin/user/${username}/toggle-disabled`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('success', data.message);
+                
+                // Update UI dynamically
+                const userRow = document.querySelector(`tr[data-username="${username}"]`);
+                if (userRow) {
+                    const statusCell = userRow.querySelector('td:nth-child(3)');
+                    const actionButton = userRow.querySelector('button[onclick^="toggleDisabled"]');
+                    
+                    if (data.is_disabled) {
+                        statusCell.innerHTML = '<span class="badge bg-danger">Disabled</span>';
+                        actionButton.innerHTML = '<i class="fas fa-user-check me-1"></i>Enable';
+                        actionButton.classList.remove('btn-danger');
+                        actionButton.classList.add('btn-success');
+                    } else {
+                        statusCell.innerHTML = '<span class="badge bg-success">Active</span>';
+                        actionButton.innerHTML = '<i class="fas fa-user-slash me-1"></i>Disable';
+                        actionButton.classList.remove('btn-success');
+                        actionButton.classList.add('btn-danger');
+                    }
+                    
+                    // Update the onclick handler with new status
+                    actionButton.setAttribute('onclick', `toggleDisabled('${username}', ${!data.is_disabled})`);
+                }
+            } else {
+                showAlert('danger', data.message || 'Error toggling user status');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('danger', 'Error toggling user status');
+        });
+    }
+
+    function deleteUser(username) {
+        if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+            fetch(`/admin/user/${username}`, {
+                method: 'DELETE',
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      location.reload();
+                  } else {
+                      alert('Error deleting user');
+                  }
+              });
+        }
+    }
+
+    function regenerateToken(username) {
+        if (confirm('Are you sure you want to regenerate the token? The old token will stop working immediately.')) {
+            fetch(`/admin/api-user/${username}/token`, {
+                method: 'POST',
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      location.reload();
+                  } else {
+                      alert('Error regenerating token');
+                  }
+              });
+        }
+    }
+
+    function deleteApiUser(username) {
+        if (confirm('Are you sure you want to delete this API user? This action cannot be undone.')) {
+            fetch(`/admin/api-user/${username}`, {
+                method: 'DELETE',
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      location.reload();
+                  } else {
+                      alert('Error deleting API user');
+                  }
+              });
+        }
+    }
+
+    function createApiUser() {
+        const username = document.getElementById('apiUsername').value;
+        const password = document.getElementById('apiPassword').value;
+
+        fetch('/admin/api-user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password,
+            }),
+        }).then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                  location.reload();
+              } else {
+                  alert('Error creating API user');
+              }
+          });
+    }
+
+    let vacationModal;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        vacationModal = new bootstrap.Modal(document.getElementById('vacationModal'));
+    });
+    
+    function showSetVacationModal(username) {
+        document.getElementById('vacation-username').value = username;
+        vacationModal.show();
+    }
+    
+    function setVacation() {
+        const username = document.getElementById('vacation-username').value;
+        const startDate = document.getElementById('vacation-start').value;
+        const endDate = document.getElementById('vacation-end').value;
+        
+        if (!startDate || !endDate) {
+            showAlert('danger', 'Please select both start and end dates');
+            return;
+        }
+        
+        fetch(`/admin/user/${username}/set-vacation`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                start_date: startDate,
+                end_date: endDate
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('success', data.message);
+                vacationModal.hide();
+                
+                // Update UI dynamically
+                const userRow = document.querySelector(`tr[data-username="${username}"]`);
+                if (userRow) {
+                    const vacationCell = userRow.querySelector('td:nth-child(5)');
+                    const formattedStartDate = new Date(startDate).toISOString().split('T')[0];
+                    const formattedEndDate = new Date(endDate).toISOString().split('T')[0];
+                    
+                    vacationCell.innerHTML = `
+                        <span class="badge bg-info">
+                            ${formattedStartDate} to ${formattedEndDate}
+                        </span>
+                        <button class="btn btn-sm btn-outline-danger" onclick="clearVacation('${username}')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                }
+            } else {
+                showAlert('danger', data.message || 'Error setting vacation period');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('danger', 'Error setting vacation period');
+        });
+    }
+    
+    function clearVacation(username) {
+        if (!confirm('Are you sure you want to clear the vacation period for this user?')) {
+            return;
+        }
+        
+        fetch(`/admin/user/${username}/clear-vacation`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('success', data.message);
+                
+                // Update UI dynamically
+                const userRow = document.querySelector(`tr[data-username="${username}"]`);
+                if (userRow) {
+                    const vacationCell = userRow.querySelector('td:nth-child(5)');
+                    vacationCell.innerHTML = `
+                        <button class="btn btn-sm btn-outline-primary" onclick="showSetVacationModal('${username}')">
+                            <i class="fas fa-calendar-plus"></i> Set
+                        </button>
+                    `;
+                }
+            } else {
+                showAlert('danger', data.message || 'Error clearing vacation period');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('danger', 'Error clearing vacation period');
+        });
+    }
+</script>
+{% endblock %}

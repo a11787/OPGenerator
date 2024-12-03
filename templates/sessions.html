@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">User Sessions</h2>
+    
+    {% if error %}
+    <div class="alert alert-danger" role="alert">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>IP Address</th>
+                            <th>Computer Name</th>
+                            <th>Browser Info</th>
+                            <th>Login Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for session in sessions %}
+                        <tr>
+                            <td>{{ session.username }}</td>
+                            <td>{{ session.ip_address }}</td>
+                            <td>{{ session.computer_name }}</td>
+                            <td>{{ session.user_agent }}</td>
+                            <td>{{ session.login_time }}</td>
+                            <td>
+                                {% if session.logout_time == 'Active' %}
+                                <span class="badge bg-success">Active</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Logged Out</span>
+                                <br>
+                                <small class="text-muted">{{ session.logout_time }}</small>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

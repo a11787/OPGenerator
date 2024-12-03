@@ -1,0 +1,955 @@
+2024-12-01 01:00:02,084 - INFO - 127.0.0.1 - - [01/Dec/2024 01:00:02] "GET /admin HTTP/1.1" 200 -
+2024-12-01 01:00:19,229 - INFO - 127.0.0.1 - - [01/Dec/2024 01:00:19] "GET / HTTP/1.1" 200 -
+2024-12-01 01:00:27,694 - INFO - 127.0.0.1 - - [01/Dec/2024 01:00:27] "POST /generate HTTP/1.1" 200 -
+2024-12-01 01:00:37,199 - INFO - 127.0.0.1 - - [01/Dec/2024 01:00:37] "GET /admin HTTP/1.1" 200 -
+2024-12-01 01:00:45,001 - INFO - 127.0.0.1 - - [01/Dec/2024 01:00:45] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-12-01 01:00:45,005 - INFO - 127.0.0.1 - - [01/Dec/2024 01:00:45] "GET /login HTTP/1.1" 200 -
+2024-12-01 01:00:46,594 - INFO - 127.0.0.1 - - [01/Dec/2024 01:00:46] "GET /signup HTTP/1.1" 200 -
+2024-12-01 01:00:53,140 - INFO - 127.0.0.1 - - [01/Dec/2024 01:00:53] "POST /signup HTTP/1.1" 200 -
+2024-12-01 01:00:55,169 - INFO - 127.0.0.1 - - [01/Dec/2024 01:00:55] "GET /login HTTP/1.1" 200 -
+2024-12-01 01:01:06,030 - INFO - 127.0.0.1 - - [01/Dec/2024 01:01:06] "POST /login HTTP/1.1" 200 -
+2024-12-01 01:01:06,058 - INFO - 127.0.0.1 - - [01/Dec/2024 01:01:06] "GET /admin HTTP/1.1" 200 -
+2024-12-01 01:01:10,450 - INFO - 127.0.0.1 - - [01/Dec/2024 01:01:10] "POST /admin/user/haytham/toggle-admin HTTP/1.1" 200 -
+2024-12-01 01:01:10,469 - INFO - 127.0.0.1 - - [01/Dec/2024 01:01:10] "GET /admin HTTP/1.1" 200 -
+2024-12-01 01:01:15,369 - INFO - 127.0.0.1 - - [01/Dec/2024 01:01:15] "POST /admin/user/haytham/toggle-admin HTTP/1.1" 200 -
+2024-12-01 01:01:15,381 - INFO - 127.0.0.1 - - [01/Dec/2024 01:01:15] "GET /admin HTTP/1.1" 200 -
+2024-12-01 01:01:31,254 - INFO - 127.0.0.1 - - [01/Dec/2024 01:01:31] "POST /admin/api-user HTTP/1.1" 200 -
+2024-12-01 01:01:35,144 - INFO - 127.0.0.1 - - [01/Dec/2024 01:01:35] "POST /admin/api-user HTTP/1.1" 200 -
+2024-12-01 01:01:39,812 - INFO - 127.0.0.1 - - [01/Dec/2024 01:01:39] "POST /admin/api-user HTTP/1.1" 200 -
+2024-12-01 01:01:39,831 - INFO - 127.0.0.1 - - [01/Dec/2024 01:01:39] "GET /admin HTTP/1.1" 200 -
+2024-12-01 01:03:27,269 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-01 01:03:27,302 - INFO -  * Restarting with stat
+2024-12-01 01:03:27,629 - INFO - Loaded API token from .env: testtoken123
+2024-12-01 01:03:27,782 - INFO - Database initialized successfully with admin user
+2024-12-01 01:03:27,790 - WARNING -  * Debugger is active!
+2024-12-01 01:03:27,793 - INFO -  * Debugger PIN: 467-652-521
+2024-12-01 01:03:28,059 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-01 01:03:28,095 - INFO -  * Restarting with stat
+2024-12-01 01:03:28,395 - INFO - Loaded API token from .env: testtoken123
+2024-12-01 01:03:28,535 - INFO - Database initialized successfully with admin user
+2024-12-01 01:03:28,540 - WARNING -  * Debugger is active!
+2024-12-01 01:03:28,540 - INFO -  * Debugger PIN: 467-652-521
+2024-12-01 01:03:37,490 - INFO - 127.0.0.1 - - [01/Dec/2024 01:03:37] "[32mPOST /admin/api-user/haytham2/token HTTP/1.1[0m" 302 -
+2024-12-01 01:03:37,505 - INFO - 127.0.0.1 - - [01/Dec/2024 01:03:37] "GET /login HTTP/1.1" 200 -
+2024-12-01 01:03:51,061 - INFO - 127.0.0.1 - - [01/Dec/2024 01:03:51] "[32mDELETE /admin/api-user/haytham2 HTTP/1.1[0m" 302 -
+2024-12-01 01:03:51,069 - INFO - 127.0.0.1 - - [01/Dec/2024 01:03:51] "[31m[1mDELETE /login HTTP/1.1[0m" 405 -
+2024-12-01 01:03:54,948 - INFO - 127.0.0.1 - - [01/Dec/2024 01:03:54] "[32mDELETE /admin/api-user/haytham2 HTTP/1.1[0m" 302 -
+2024-12-01 01:03:54,952 - INFO - 127.0.0.1 - - [01/Dec/2024 01:03:54] "[31m[1mDELETE /login HTTP/1.1[0m" 405 -
+2024-12-01 01:03:56,471 - INFO - 127.0.0.1 - - [01/Dec/2024 01:03:56] "[32mGET /admin HTTP/1.1[0m" 302 -
+2024-12-01 01:03:56,476 - INFO - 127.0.0.1 - - [01/Dec/2024 01:03:56] "GET /login HTTP/1.1" 200 -
+2024-12-01 01:04:06,494 - INFO - 127.0.0.1 - - [01/Dec/2024 01:04:06] "POST /login HTTP/1.1" 200 -
+2024-12-01 01:04:06,540 - INFO - 127.0.0.1 - - [01/Dec/2024 01:04:06] "GET /admin HTTP/1.1" 200 -
+2024-12-01 01:04:10,120 - INFO - 127.0.0.1 - - [01/Dec/2024 01:04:10] "GET /admin HTTP/1.1" 200 -
+2024-12-01 01:04:11,411 - INFO - 127.0.0.1 - - [01/Dec/2024 01:04:11] "GET /admin HTTP/1.1" 200 -
+2024-12-01 01:04:28,943 - INFO - 127.0.0.1 - - [01/Dec/2024 01:04:28] "POST /admin/api-user HTTP/1.1" 200 -
+2024-12-01 01:04:28,959 - INFO - 127.0.0.1 - - [01/Dec/2024 01:04:28] "GET /admin HTTP/1.1" 200 -
+2024-12-01 01:05:45,107 - INFO - 127.0.0.1 - - [01/Dec/2024 01:05:45] "POST /admin/api-user/haytham/token HTTP/1.1" 200 -
+2024-12-01 01:05:45,125 - INFO - 127.0.0.1 - - [01/Dec/2024 01:05:45] "GET /admin HTTP/1.1" 200 -
+2024-12-01 01:05:54,822 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-01 01:05:54,855 - INFO -  * Restarting with stat
+2024-12-01 01:05:55,169 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-01 01:05:55,171 - INFO - Loaded API token from .env: testtoken123
+2024-12-01 01:05:55,210 - INFO -  * Restarting with stat
+2024-12-01 01:05:55,328 - INFO - Database initialized successfully with admin user
+2024-12-01 01:05:55,331 - WARNING -  * Debugger is active!
+2024-12-01 01:05:55,338 - INFO -  * Debugger PIN: 467-652-521
+2024-12-01 01:05:55,511 - INFO - Loaded API token from .env: testtoken123
+2024-12-01 01:05:55,651 - INFO - Database initialized successfully with admin user
+2024-12-01 01:05:55,660 - WARNING -  * Debugger is active!
+2024-12-01 01:05:55,662 - INFO -  * Debugger PIN: 467-652-521
+2024-12-01 01:06:23,771 - INFO - 127.0.0.1 - - [01/Dec/2024 01:06:23] "[32mGET /admin HTTP/1.1[0m" 302 -
+2024-12-01 01:06:23,780 - INFO - 127.0.0.1 - - [01/Dec/2024 01:06:23] "GET /login HTTP/1.1" 200 -
+2024-12-01 01:06:31,502 - INFO - 127.0.0.1 - - [01/Dec/2024 01:06:31] "POST /login HTTP/1.1" 200 -
+2024-12-01 01:06:31,542 - INFO - 127.0.0.1 - - [01/Dec/2024 01:06:31] "GET /admin HTTP/1.1" 200 -
+2024-12-01 01:06:38,478 - INFO - 127.0.0.1 - - [01/Dec/2024 01:06:38] "POST /admin/api-user HTTP/1.1" 200 -
+2024-12-01 01:06:38,500 - INFO - 127.0.0.1 - - [01/Dec/2024 01:06:38] "GET /admin HTTP/1.1" 200 -
+2024-12-01 01:07:47,160 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-01 01:07:47,198 - INFO -  * Restarting with stat
+2024-12-01 01:07:47,408 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-01 01:07:47,449 - INFO -  * Restarting with stat
+2024-12-01 01:07:47,497 - INFO - Loaded API token from .env: testtoken123
+2024-12-01 01:07:47,640 - INFO - Database initialized successfully with admin user
+2024-12-01 01:07:47,656 - WARNING -  * Debugger is active!
+2024-12-01 01:07:47,656 - INFO -  * Debugger PIN: 467-652-521
+2024-12-01 01:07:47,736 - INFO - Loaded API token from .env: testtoken123
+2024-12-01 01:07:47,879 - INFO - Database initialized successfully with admin user
+2024-12-01 01:07:47,887 - WARNING -  * Debugger is active!
+2024-12-01 01:07:47,890 - INFO -  * Debugger PIN: 467-652-521
+2024-12-01 01:08:02,923 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-01 01:08:02,950 - INFO -  * Restarting with stat
+2024-12-01 01:08:03,148 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-01 01:08:03,190 - INFO -  * Restarting with stat
+2024-12-01 01:08:03,277 - INFO - Loaded API token from .env: testtoken123
+2024-12-01 01:08:03,425 - INFO - Database initialized successfully with admin user
+2024-12-01 01:08:03,432 - WARNING -  * Debugger is active!
+2024-12-01 01:08:03,432 - INFO -  * Debugger PIN: 467-652-521
+2024-12-01 01:08:03,478 - INFO - Loaded API token from .env: testtoken123
+2024-12-01 01:08:03,616 - INFO - Database initialized successfully with admin user
+2024-12-01 01:08:03,625 - WARNING -  * Debugger is active!
+2024-12-01 01:08:03,629 - INFO -  * Debugger PIN: 467-652-521
+2024-12-01 01:08:16,651 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-01 01:08:16,686 - INFO -  * Restarting with stat
+2024-12-01 01:08:16,840 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-01 01:08:16,875 - INFO -  * Restarting with stat
+2024-12-01 01:08:16,990 - INFO - Loaded API token from .env: testtoken123
+2024-12-01 01:08:17,140 - INFO - Database initialized successfully with admin user
+2024-12-01 01:08:17,146 - WARNING -  * Debugger is active!
+2024-12-01 01:08:17,151 - INFO -  * Debugger PIN: 467-652-521
+2024-12-01 01:08:17,169 - INFO - Loaded API token from .env: testtoken123
+2024-12-01 01:08:17,338 - INFO - Database initialized successfully with admin user
+2024-12-01 01:08:17,346 - WARNING -  * Debugger is active!
+2024-12-01 01:08:17,349 - INFO -  * Debugger PIN: 467-652-521
+2024-12-01 01:08:33,143 - INFO - 127.0.0.1 - - [01/Dec/2024 01:08:33] "[32mGET /admin HTTP/1.1[0m" 302 -
+2024-12-01 01:08:33,153 - INFO - 127.0.0.1 - - [01/Dec/2024 01:08:33] "GET /login HTTP/1.1" 200 -
+2024-12-01 01:08:51,726 - INFO - 127.0.0.1 - - [01/Dec/2024 01:08:51] "POST /login HTTP/1.1" 200 -
+2024-12-01 01:08:51,769 - INFO - 127.0.0.1 - - [01/Dec/2024 01:08:51] "GET /admin HTTP/1.1" 200 -
+2024-12-01 01:08:56,569 - INFO - 127.0.0.1 - - [01/Dec/2024 01:08:56] "POST /admin/api-user HTTP/1.1" 200 -
+2024-12-01 01:08:56,588 - INFO - 127.0.0.1 - - [01/Dec/2024 01:08:56] "GET /admin HTTP/1.1" 200 -
+2024-12-01 01:10:26,860 - INFO - 127.0.0.1 - - [01/Dec/2024 01:10:26] "GET / HTTP/1.1" 200 -
+2024-12-01 01:10:46,853 - INFO - 127.0.0.1 - - [01/Dec/2024 01:10:46] "POST /generate HTTP/1.1" 200 -
+2024-12-01 01:12:07,979 - INFO - 127.0.0.1 - - [01/Dec/2024 01:12:07] "[31m[1mPOST /search HTTP/1.1[0m" 405 -
+2024-12-01 01:12:11,808 - INFO - 127.0.0.1 - - [01/Dec/2024 01:12:11] "[31m[1mPOST /search HTTP/1.1[0m" 405 -
+2024-12-01 01:12:29,016 - INFO - 127.0.0.1 - - [01/Dec/2024 01:12:29] "[31m[1mPOST /search HTTP/1.1[0m" 405 -
+2024-12-01 01:13:19,032 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-01 01:13:19,071 - INFO -  * Restarting with stat
+2024-12-01 01:13:19,201 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-01 01:13:19,240 - INFO -  * Restarting with stat
+2024-12-01 01:13:19,453 - INFO - Loaded API token from .env: testtoken123
+2024-12-01 01:13:19,651 - INFO - Loaded API token from .env: testtoken123
+2024-12-01 01:13:19,690 - INFO - Database initialized successfully with admin user
+2024-12-01 01:13:19,701 - WARNING -  * Debugger is active!
+2024-12-01 01:13:19,701 - INFO -  * Debugger PIN: 467-652-521
+2024-12-01 01:13:19,836 - INFO - Database initialized successfully with admin user
+2024-12-01 01:13:19,841 - WARNING -  * Debugger is active!
+2024-12-01 01:13:19,849 - INFO -  * Debugger PIN: 467-652-521
+2024-12-01 01:13:34,951 - INFO - 127.0.0.1 - - [01/Dec/2024 01:13:34] "[31m[1mPOST /search HTTP/1.1[0m" 405 -
+2024-12-01 01:13:37,528 - INFO - 127.0.0.1 - - [01/Dec/2024 01:13:37] "[32mGET / HTTP/1.1[0m" 302 -
+2024-12-01 01:13:37,540 - INFO - 127.0.0.1 - - [01/Dec/2024 01:13:37] "GET /login HTTP/1.1" 200 -
+2024-12-01 01:13:40,062 - INFO - 127.0.0.1 - - [01/Dec/2024 01:13:40] "[31m[1mPOST /login HTTP/1.1[0m" 401 -
+2024-12-01 01:13:45,829 - INFO - 127.0.0.1 - - [01/Dec/2024 01:13:45] "POST /login HTTP/1.1" 200 -
+2024-12-01 01:13:45,888 - INFO - 127.0.0.1 - - [01/Dec/2024 01:13:45] "GET /admin HTTP/1.1" 200 -
+2024-12-01 01:13:48,879 - INFO - 127.0.0.1 - - [01/Dec/2024 01:13:48] "GET / HTTP/1.1" 200 -
+2024-12-01 01:13:52,430 - INFO - 127.0.0.1 - - [01/Dec/2024 01:13:52] "[31m[1mPOST /search HTTP/1.1[0m" 405 -
+2024-12-01 01:14:55,520 - INFO - 127.0.0.1 - - [01/Dec/2024 01:14:55] "POST /generate HTTP/1.1" 200 -
+2024-12-01 01:14:59,448 - INFO - 127.0.0.1 - - [01/Dec/2024 01:14:59] "[31m[1mPOST /search HTTP/1.1[0m" 405 -
+2024-12-01 01:15:36,790 - INFO - 127.0.0.1 - - [01/Dec/2024 01:15:36] "GET / HTTP/1.1" 200 -
+2024-12-01 01:15:41,643 - INFO - 127.0.0.1 - - [01/Dec/2024 01:15:41] "GET /search?op_number=5 HTTP/1.1" 200 -
+2024-12-01 01:15:58,689 - INFO - 127.0.0.1 - - [01/Dec/2024 01:15:58] "GET /search?op_number=6 HTTP/1.1" 200 -
+2024-12-01 01:16:16,300 - INFO - 127.0.0.1 - - [01/Dec/2024 01:16:16] "GET /search?op_number=6 HTTP/1.1" 200 -
+2024-12-01 01:17:07,351 - INFO - 127.0.0.1 - - [01/Dec/2024 01:17:07] "GET / HTTP/1.1" 200 -
+2024-12-01 01:17:12,078 - INFO - 127.0.0.1 - - [01/Dec/2024 01:17:12] "GET /search?op_number=6 HTTP/1.1" 200 -
+2024-12-01 01:17:16,913 - INFO - 127.0.0.1 - - [01/Dec/2024 01:17:16] "GET /search?op_number=6 HTTP/1.1" 200 -
+2024-12-01 01:17:32,190 - INFO - 127.0.0.1 - - [01/Dec/2024 01:17:32] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-12-01 01:17:32,195 - INFO - 127.0.0.1 - - [01/Dec/2024 01:17:32] "GET /login HTTP/1.1" 200 -
+2024-12-01 01:18:31,360 - INFO - 127.0.0.1 - - [01/Dec/2024 01:18:31] "[31m[1mPOST /login HTTP/1.1[0m" 401 -
+2024-12-01 21:38:18,726 - INFO - Loaded API token from .env: testtoken123
+2024-12-01 21:38:19,012 - INFO - Database initialized successfully with admin user
+2024-12-01 21:38:19,094 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-01 21:38:19,094 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-01 21:38:19,095 - INFO -  * Restarting with stat
+2024-12-01 21:38:19,349 - INFO - Loaded API token from .env: testtoken123
+2024-12-01 21:38:19,505 - INFO - Database initialized successfully with admin user
+2024-12-01 21:38:19,505 - WARNING -  * Debugger is active!
+2024-12-01 21:38:19,505 - INFO -  * Debugger PIN: 467-652-521
+2024-12-01 21:38:38,899 - INFO - 127.0.0.1 - - [01/Dec/2024 21:38:38] "[32mGET / HTTP/1.1[0m" 302 -
+2024-12-01 21:38:39,149 - INFO - 127.0.0.1 - - [01/Dec/2024 21:38:39] "GET /login HTTP/1.1" 200 -
+2024-12-01 21:38:41,344 - INFO - 127.0.0.1 - - [01/Dec/2024 21:38:41] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2024-12-01 21:38:48,337 - INFO - 127.0.0.1 - - [01/Dec/2024 21:38:48] "POST /login HTTP/1.1" 200 -
+2024-12-01 21:38:48,528 - INFO - 127.0.0.1 - - [01/Dec/2024 21:38:48] "GET /admin HTTP/1.1" 200 -
+2024-12-01 21:38:57,901 - INFO - 127.0.0.1 - - [01/Dec/2024 21:38:57] "GET / HTTP/1.1" 200 -
+2024-12-02 21:49:23,658 - INFO - Loaded API token from .env: testtoken123
+2024-12-02 21:49:23,872 - INFO - Database initialized successfully with admin user
+2024-12-02 21:49:23,941 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-02 21:49:23,942 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-02 21:49:23,947 - INFO -  * Restarting with stat
+2024-12-02 21:49:24,213 - INFO - Loaded API token from .env: testtoken123
+2024-12-02 21:49:24,341 - INFO - Database initialized successfully with admin user
+2024-12-02 21:49:24,347 - WARNING -  * Debugger is active!
+2024-12-02 21:49:24,349 - INFO -  * Debugger PIN: 143-687-146
+2024-12-02 21:49:30,862 - INFO - 127.0.0.1 - - [02/Dec/2024 21:49:30] "[32mGET / HTTP/1.1[0m" 302 -
+2024-12-02 21:49:31,131 - INFO - 127.0.0.1 - - [02/Dec/2024 21:49:31] "GET /login HTTP/1.1" 200 -
+2024-12-02 21:49:32,346 - INFO - 127.0.0.1 - - [02/Dec/2024 21:49:32] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2024-12-02 21:49:35,052 - INFO - 127.0.0.1 - - [02/Dec/2024 21:49:35] "GET /signup HTTP/1.1" 200 -
+2024-12-03 11:44:45,278 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 11:44:45,503 - INFO - Database initialized successfully with admin user
+2024-12-03 11:44:45,523 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-03 11:44:45,523 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-03 11:44:45,525 - INFO -  * Restarting with stat
+2024-12-03 11:44:45,794 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 11:44:45,938 - INFO - Database initialized successfully with admin user
+2024-12-03 11:44:45,944 - WARNING -  * Debugger is active!
+2024-12-03 11:44:45,947 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 11:45:16,200 - INFO - 127.0.0.1 - - [03/Dec/2024 11:45:16] "[32mGET / HTTP/1.1[0m" 302 -
+2024-12-03 11:45:16,466 - INFO - 127.0.0.1 - - [03/Dec/2024 11:45:16] "GET /login HTTP/1.1" 200 -
+2024-12-03 11:45:17,657 - INFO - 127.0.0.1 - - [03/Dec/2024 11:45:17] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2024-12-03 11:45:24,653 - INFO - 127.0.0.1 - - [03/Dec/2024 11:45:24] "GET /signup HTTP/1.1" 200 -
+2024-12-03 11:45:59,802 - INFO - 127.0.0.1 - - [03/Dec/2024 11:45:59] "POST /signup HTTP/1.1" 200 -
+2024-12-03 11:46:02,133 - INFO - 127.0.0.1 - - [03/Dec/2024 11:46:02] "GET /login HTTP/1.1" 200 -
+2024-12-03 11:46:11,423 - INFO - 127.0.0.1 - - [03/Dec/2024 11:46:11] "[31m[1mPOST /login HTTP/1.1[0m" 403 -
+2024-12-03 11:46:24,128 - INFO - 127.0.0.1 - - [03/Dec/2024 11:46:24] "POST /login HTTP/1.1" 200 -
+2024-12-03 11:46:24,332 - INFO - 127.0.0.1 - - [03/Dec/2024 11:46:24] "GET /admin HTTP/1.1" 200 -
+2024-12-03 11:46:41,479 - INFO - 127.0.0.1 - - [03/Dec/2024 11:46:41] "POST /admin/user/haytham/toggle-admin HTTP/1.1" 200 -
+2024-12-03 11:46:41,808 - INFO - 127.0.0.1 - - [03/Dec/2024 11:46:41] "GET /admin HTTP/1.1" 200 -
+2024-12-03 11:46:44,847 - INFO - 127.0.0.1 - - [03/Dec/2024 11:46:44] "POST /admin/user/haytham/toggle-admin HTTP/1.1" 200 -
+2024-12-03 11:46:45,164 - INFO - 127.0.0.1 - - [03/Dec/2024 11:46:45] "GET /admin HTTP/1.1" 200 -
+2024-12-03 11:46:58,929 - INFO - 127.0.0.1 - - [03/Dec/2024 11:46:58] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-12-03 11:46:59,248 - INFO - 127.0.0.1 - - [03/Dec/2024 11:46:59] "GET /login HTTP/1.1" 200 -
+2024-12-03 11:47:06,125 - INFO - 127.0.0.1 - - [03/Dec/2024 11:47:06] "POST /login HTTP/1.1" 200 -
+2024-12-03 11:47:06,454 - INFO - 127.0.0.1 - - [03/Dec/2024 11:47:06] "GET / HTTP/1.1" 200 -
+2024-12-03 11:47:36,742 - INFO - 127.0.0.1 - - [03/Dec/2024 11:47:36] "POST /generate HTTP/1.1" 200 -
+2024-12-03 11:47:51,542 - INFO - 127.0.0.1 - - [03/Dec/2024 11:47:51] "GET /search?op_number=7 HTTP/1.1" 200 -
+2024-12-03 11:48:06,167 - INFO - 127.0.0.1 - - [03/Dec/2024 11:48:06] "POST /generate HTTP/1.1" 200 -
+2024-12-03 11:48:13,803 - INFO - 127.0.0.1 - - [03/Dec/2024 11:48:13] "POST /generate HTTP/1.1" 200 -
+2024-12-03 11:48:19,768 - INFO - 127.0.0.1 - - [03/Dec/2024 11:48:19] "GET /search?name=haytham&op_number=7 HTTP/1.1" 200 -
+2024-12-03 11:48:23,066 - INFO - 127.0.0.1 - - [03/Dec/2024 11:48:23] "GET /search?name=haytham&op_number=7 HTTP/1.1" 200 -
+2024-12-03 11:48:27,446 - INFO - 127.0.0.1 - - [03/Dec/2024 11:48:27] "GET /search?name=haytham HTTP/1.1" 200 -
+2024-12-03 11:49:12,572 - INFO - 127.0.0.1 - - [03/Dec/2024 11:49:12] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-12-03 11:49:12,839 - INFO - 127.0.0.1 - - [03/Dec/2024 11:49:12] "GET /login HTTP/1.1" 200 -
+2024-12-03 11:49:22,472 - INFO - 127.0.0.1 - - [03/Dec/2024 11:49:22] "POST /login HTTP/1.1" 200 -
+2024-12-03 11:49:22,804 - INFO - 127.0.0.1 - - [03/Dec/2024 11:49:22] "GET /admin HTTP/1.1" 200 -
+2024-12-03 11:49:29,729 - INFO - 127.0.0.1 - - [03/Dec/2024 11:49:29] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-12-03 11:49:30,036 - INFO - 127.0.0.1 - - [03/Dec/2024 11:49:30] "GET /login HTTP/1.1" 200 -
+2024-12-03 11:49:44,047 - INFO - 127.0.0.1 - - [03/Dec/2024 11:49:44] "POST /login HTTP/1.1" 200 -
+2024-12-03 11:49:44,381 - INFO - 127.0.0.1 - - [03/Dec/2024 11:49:44] "GET /admin HTTP/1.1" 200 -
+2024-12-03 11:50:11,327 - INFO - 127.0.0.1 - - [03/Dec/2024 11:50:11] "[33mGET /admin/api/docs HTTP/1.1[0m" 404 -
+2024-12-03 11:52:34,512 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 11:52:34,552 - INFO -  * Restarting with stat
+2024-12-03 11:52:34,840 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 11:52:35,028 - INFO - Database initialized successfully with admin user
+2024-12-03 11:52:35,035 - WARNING -  * Debugger is active!
+2024-12-03 11:52:35,038 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 11:52:59,352 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 11:52:59,389 - INFO -  * Restarting with stat
+2024-12-03 11:52:59,732 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 11:52:59,925 - INFO - Database initialized successfully with admin user
+2024-12-03 11:52:59,932 - WARNING -  * Debugger is active!
+2024-12-03 11:52:59,935 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 11:53:16,156 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 11:53:16,193 - INFO -  * Restarting with stat
+2024-12-03 11:53:16,493 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 11:53:16,658 - INFO - Database initialized successfully with admin user
+2024-12-03 11:53:16,664 - WARNING -  * Debugger is active!
+2024-12-03 11:53:16,667 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 11:54:12,635 - INFO - 127.0.0.1 - - [03/Dec/2024 11:54:12] "[32mGET / HTTP/1.1[0m" 302 -
+2024-12-03 11:54:12,904 - INFO - 127.0.0.1 - - [03/Dec/2024 11:54:12] "GET /login HTTP/1.1" 200 -
+2024-12-03 11:54:19,357 - INFO - 127.0.0.1 - - [03/Dec/2024 11:54:19] "POST /login HTTP/1.1" 200 -
+2024-12-03 11:54:19,681 - INFO - 127.0.0.1 - - [03/Dec/2024 11:54:19] "GET / HTTP/1.1" 200 -
+2024-12-03 11:54:30,344 - INFO - 127.0.0.1 - - [03/Dec/2024 11:54:30] "GET /login HTTP/1.1" 200 -
+2024-12-03 11:54:35,953 - INFO - 127.0.0.1 - - [03/Dec/2024 11:54:35] "POST /login HTTP/1.1" 200 -
+2024-12-03 11:54:36,126 - INFO - 127.0.0.1 - - [03/Dec/2024 11:54:36] "GET / HTTP/1.1" 200 -
+2024-12-03 11:54:43,840 - INFO - 127.0.0.1 - - [03/Dec/2024 11:54:43] "[33mGET /admin/ HTTP/1.1[0m" 404 -
+2024-12-03 11:55:10,305 - INFO - 127.0.0.1 - - [03/Dec/2024 11:55:10] "GET / HTTP/1.1" 200 -
+2024-12-03 11:55:31,307 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 11:55:31,351 - INFO -  * Restarting with stat
+2024-12-03 11:55:31,672 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 11:55:31,842 - INFO - Database initialized successfully with admin user
+2024-12-03 11:55:31,847 - WARNING -  * Debugger is active!
+2024-12-03 11:55:31,850 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 11:56:16,953 - INFO - 127.0.0.1 - - [03/Dec/2024 11:56:16] "[32mGET / HTTP/1.1[0m" 302 -
+2024-12-03 11:56:17,197 - INFO - 127.0.0.1 - - [03/Dec/2024 11:56:17] "GET /login HTTP/1.1" 200 -
+2024-12-03 11:56:21,838 - INFO - 127.0.0.1 - - [03/Dec/2024 11:56:21] "[32mPOST /login HTTP/1.1[0m" 302 -
+2024-12-03 11:56:22,147 - INFO - 127.0.0.1 - - [03/Dec/2024 11:56:22] "GET / HTTP/1.1" 200 -
+2024-12-03 11:57:24,249 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 11:57:24,286 - INFO -  * Restarting with stat
+2024-12-03 11:57:24,607 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 11:57:24,711 - WARNING -  * Debugger is active!
+2024-12-03 11:57:24,715 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 11:57:42,968 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 11:57:43,004 - INFO -  * Restarting with stat
+2024-12-03 11:57:43,303 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 11:57:43,375 - WARNING -  * Debugger is active!
+2024-12-03 11:57:43,378 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 11:58:02,230 - INFO - 127.0.0.1 - - [03/Dec/2024 11:58:02] "[32mGET / HTTP/1.1[0m" 302 -
+2024-12-03 11:58:02,498 - INFO - 127.0.0.1 - - [03/Dec/2024 11:58:02] "GET /login HTTP/1.1" 200 -
+2024-12-03 11:58:06,845 - INFO - 127.0.0.1 - - [03/Dec/2024 11:58:06] "[32mPOST /login HTTP/1.1[0m" 302 -
+2024-12-03 11:58:07,167 - INFO - 127.0.0.1 - - [03/Dec/2024 11:58:07] "GET / HTTP/1.1" 200 -
+2024-12-03 11:59:09,440 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 11:59:09,475 - INFO -  * Restarting with stat
+2024-12-03 11:59:09,767 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 11:59:09,873 - WARNING -  * Debugger is active!
+2024-12-03 11:59:09,876 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 11:59:21,043 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 11:59:21,074 - INFO -  * Restarting with stat
+2024-12-03 11:59:21,391 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 11:59:21,473 - WARNING -  * Debugger is active!
+2024-12-03 11:59:21,477 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 11:59:52,536 - INFO - 127.0.0.1 - - [03/Dec/2024 11:59:52] "[32mGET / HTTP/1.1[0m" 302 -
+2024-12-03 11:59:52,800 - INFO - 127.0.0.1 - - [03/Dec/2024 11:59:52] "GET /login HTTP/1.1" 200 -
+2024-12-03 11:59:57,273 - INFO - 127.0.0.1 - - [03/Dec/2024 11:59:57] "[32mPOST /login HTTP/1.1[0m" 302 -
+2024-12-03 11:59:57,589 - INFO - 127.0.0.1 - - [03/Dec/2024 11:59:57] "GET / HTTP/1.1" 200 -
+2024-12-03 12:00:07,056 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:00:07,090 - INFO -  * Restarting with stat
+2024-12-03 12:00:07,361 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:00:07,449 - WARNING -  * Debugger is active!
+2024-12-03 12:00:07,452 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:00:12,472 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:00:12,549 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-03 12:00:12,549 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-03 12:00:12,549 - INFO -  * Restarting with stat
+2024-12-03 12:00:12,822 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:00:12,898 - WARNING -  * Debugger is active!
+2024-12-03 12:00:12,901 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:00:16,449 - INFO - 127.0.0.1 - - [03/Dec/2024 12:00:16] "[32mGET / HTTP/1.1[0m" 302 -
+2024-12-03 12:00:16,717 - INFO - 127.0.0.1 - - [03/Dec/2024 12:00:16] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:00:24,486 - INFO - 127.0.0.1 - - [03/Dec/2024 12:00:24] "[32mPOST /login HTTP/1.1[0m" 302 -
+2024-12-03 12:00:24,804 - INFO - 127.0.0.1 - - [03/Dec/2024 12:00:24] "GET / HTTP/1.1" 200 -
+2024-12-03 12:01:19,519 - INFO - 127.0.0.1 - - [03/Dec/2024 12:01:19] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-12-03 12:01:19,829 - INFO - 127.0.0.1 - - [03/Dec/2024 12:01:19] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:02:17,019 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:02:17,059 - INFO -  * Restarting with stat
+2024-12-03 12:02:17,340 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:02:17,392 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:02:17,435 - INFO -  * Restarting with stat
+2024-12-03 12:02:17,454 - WARNING -  * Debugger is active!
+2024-12-03 12:02:17,457 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:02:17,736 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:02:17,805 - WARNING -  * Debugger is active!
+2024-12-03 12:02:17,808 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:02:29,633 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:02:29,669 - INFO -  * Restarting with stat
+2024-12-03 12:02:29,978 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:02:29,984 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:02:30,010 - INFO -  * Restarting with stat
+2024-12-03 12:02:30,064 - WARNING -  * Debugger is active!
+2024-12-03 12:02:30,067 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:02:30,283 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:02:30,355 - WARNING -  * Debugger is active!
+2024-12-03 12:02:30,358 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:02:54,241 - INFO - 127.0.0.1 - - [03/Dec/2024 12:02:54] "[32mPOST /login HTTP/1.1[0m" 302 -
+2024-12-03 12:02:54,425 - INFO - 127.0.0.1 - - [03/Dec/2024 12:02:54] "GET / HTTP/1.1" 200 -
+2024-12-03 12:03:07,526 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:03:07,561 - INFO -  * Restarting with stat
+2024-12-03 12:03:07,841 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:03:07,852 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:03:07,879 - INFO -  * Restarting with stat
+2024-12-03 12:03:07,969 - WARNING -  * Debugger is active!
+2024-12-03 12:03:07,973 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:03:08,222 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:03:08,285 - WARNING -  * Debugger is active!
+2024-12-03 12:03:08,288 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:03:20,601 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:03:20,706 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-03 12:03:20,706 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-03 12:03:20,707 - INFO -  * Restarting with stat
+2024-12-03 12:03:21,090 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:03:21,186 - WARNING -  * Debugger is active!
+2024-12-03 12:03:21,190 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:03:22,234 - INFO - 127.0.0.1 - - [03/Dec/2024 12:03:22] "[32mGET / HTTP/1.1[0m" 302 -
+2024-12-03 12:03:22,499 - INFO - 127.0.0.1 - - [03/Dec/2024 12:03:22] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:03:27,020 - INFO - 127.0.0.1 - - [03/Dec/2024 12:03:27] "[32mPOST /login HTTP/1.1[0m" 302 -
+2024-12-03 12:03:27,340 - INFO - 127.0.0.1 - - [03/Dec/2024 12:03:27] "GET / HTTP/1.1" 200 -
+2024-12-03 12:03:54,666 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:03:54,697 - INFO -  * Restarting with stat
+2024-12-03 12:03:54,972 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:03:55,148 - INFO - Database initialized successfully with admin user
+2024-12-03 12:03:55,154 - WARNING -  * Debugger is active!
+2024-12-03 12:03:55,157 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:04:21,471 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:04:21,628 - INFO - Database initialized successfully with admin user
+2024-12-03 12:04:21,646 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-03 12:04:21,647 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-03 12:04:21,648 - INFO -  * Restarting with stat
+2024-12-03 12:04:21,927 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:04:22,060 - INFO - Database initialized successfully with admin user
+2024-12-03 12:04:22,066 - WARNING -  * Debugger is active!
+2024-12-03 12:04:22,069 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:04:23,300 - INFO - 127.0.0.1 - - [03/Dec/2024 12:04:23] "[32mGET / HTTP/1.1[0m" 302 -
+2024-12-03 12:04:23,565 - INFO - 127.0.0.1 - - [03/Dec/2024 12:04:23] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:04:27,393 - INFO - 127.0.0.1 - - [03/Dec/2024 12:04:27] "POST /login HTTP/1.1" 200 -
+2024-12-03 12:04:27,734 - INFO - 127.0.0.1 - - [03/Dec/2024 12:04:27] "GET /admin HTTP/1.1" 200 -
+2024-12-03 12:04:34,570 - INFO - 127.0.0.1 - - [03/Dec/2024 12:04:34] "GET /admin HTTP/1.1" 200 -
+2024-12-03 12:04:36,180 - INFO - 127.0.0.1 - - [03/Dec/2024 12:04:36] "GET / HTTP/1.1" 200 -
+2024-12-03 12:04:39,306 - INFO - 127.0.0.1 - - [03/Dec/2024 12:04:39] "GET /admin HTTP/1.1" 200 -
+2024-12-03 12:08:01,730 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:08:01,769 - INFO -  * Restarting with stat
+2024-12-03 12:08:02,047 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:08:02,158 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:08:02,198 - INFO -  * Restarting with stat
+2024-12-03 12:08:02,209 - INFO - Database initialized successfully with admin user
+2024-12-03 12:08:02,216 - WARNING -  * Debugger is active!
+2024-12-03 12:08:02,219 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:08:02,506 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:08:02,639 - INFO - Database initialized successfully with admin user
+2024-12-03 12:08:02,645 - WARNING -  * Debugger is active!
+2024-12-03 12:08:02,648 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:08:56,314 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:08:56,344 - INFO -  * Restarting with stat
+2024-12-03 12:08:56,633 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:08:56,814 - INFO - Database initialized successfully with admin user
+2024-12-03 12:08:56,820 - WARNING -  * Debugger is active!
+2024-12-03 12:08:56,824 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:08:56,909 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:08:56,945 - INFO -  * Restarting with stat
+2024-12-03 12:08:57,288 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:08:57,439 - INFO - Database initialized successfully with admin user
+2024-12-03 12:08:57,444 - WARNING -  * Debugger is active!
+2024-12-03 12:08:57,448 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:09:16,773 - INFO - 127.0.0.1 - - [03/Dec/2024 12:09:16] "[32mGET /admin HTTP/1.1[0m" 302 -
+2024-12-03 12:09:17,039 - INFO - 127.0.0.1 - - [03/Dec/2024 12:09:17] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:09:21,906 - ERROR - Login error: ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'id'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+2024-12-03 12:09:21,907 - INFO - 127.0.0.1 - - [03/Dec/2024 12:09:21] "[35m[1mPOST /login HTTP/1.1[0m" 500 -
+2024-12-03 12:09:24,604 - ERROR - Login error: ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'id'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+2024-12-03 12:09:24,605 - INFO - 127.0.0.1 - - [03/Dec/2024 12:09:24] "[35m[1mPOST /login HTTP/1.1[0m" 500 -
+2024-12-03 12:09:56,211 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:09:56,243 - INFO -  * Restarting with stat
+2024-12-03 12:09:56,551 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:09:56,557 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:09:56,602 - INFO -  * Restarting with stat
+2024-12-03 12:09:56,754 - INFO - Database initialized successfully with admin user
+2024-12-03 12:09:56,760 - WARNING -  * Debugger is active!
+2024-12-03 12:09:56,763 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:09:56,931 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:09:57,091 - INFO - Database initialized successfully with admin user
+2024-12-03 12:09:57,096 - WARNING -  * Debugger is active!
+2024-12-03 12:09:57,100 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:10:23,415 - INFO - 127.0.0.1 - - [03/Dec/2024 12:10:23] "[35m[1mPOST /login HTTP/1.1[0m" 500 -
+2024-12-03 12:10:31,945 - INFO - 127.0.0.1 - - [03/Dec/2024 12:10:31] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:10:36,315 - INFO - 127.0.0.1 - - [03/Dec/2024 12:10:36] "[35m[1mPOST /login HTTP/1.1[0m" 500 -
+2024-12-03 12:12:03,650 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:12:03,690 - INFO -  * Restarting with stat
+2024-12-03 12:12:03,988 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:12:04,164 - INFO - Database initialized successfully with admin user
+2024-12-03 12:12:04,169 - WARNING -  * Debugger is active!
+2024-12-03 12:12:04,172 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:12:04,371 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:12:04,407 - INFO -  * Restarting with stat
+2024-12-03 12:12:04,697 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:12:04,846 - INFO - Database initialized successfully with admin user
+2024-12-03 12:12:04,852 - WARNING -  * Debugger is active!
+2024-12-03 12:12:04,855 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:12:15,410 - INFO - 127.0.0.1 - - [03/Dec/2024 12:12:15] "[32mPOST /login HTTP/1.1[0m" 302 -
+2024-12-03 12:12:15,663 - INFO - 127.0.0.1 - - [03/Dec/2024 12:12:15] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:12:16,542 - INFO - 127.0.0.1 - - [03/Dec/2024 12:12:16] "[32mPOST /login HTTP/1.1[0m" 302 -
+2024-12-03 12:12:16,858 - INFO - 127.0.0.1 - - [03/Dec/2024 12:12:16] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:12:18,108 - INFO - 127.0.0.1 - - [03/Dec/2024 12:12:18] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:12:25,624 - INFO - 127.0.0.1 - - [03/Dec/2024 12:12:25] "[32mPOST /login HTTP/1.1[0m" 302 -
+2024-12-03 12:12:25,784 - INFO - 127.0.0.1 - - [03/Dec/2024 12:12:25] "[32mGET /admin HTTP/1.1[0m" 302 -
+2024-12-03 12:12:25,939 - INFO - 127.0.0.1 - - [03/Dec/2024 12:12:25] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:12:31,938 - INFO - 127.0.0.1 - - [03/Dec/2024 12:12:31] "[32mPOST /login HTTP/1.1[0m" 302 -
+2024-12-03 12:12:32,257 - INFO - 127.0.0.1 - - [03/Dec/2024 12:12:32] "[32mGET /admin HTTP/1.1[0m" 302 -
+2024-12-03 12:12:32,523 - INFO - 127.0.0.1 - - [03/Dec/2024 12:12:32] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:14:31,659 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:14:31,689 - INFO -  * Restarting with stat
+2024-12-03 12:14:32,000 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:14:32,004 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:14:32,040 - INFO -  * Restarting with stat
+2024-12-03 12:14:32,198 - INFO - Database initialized successfully with admin user
+2024-12-03 12:14:32,204 - WARNING -  * Debugger is active!
+2024-12-03 12:14:32,208 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:14:32,325 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:14:32,484 - INFO - Database initialized successfully with admin user
+2024-12-03 12:14:32,491 - WARNING -  * Debugger is active!
+2024-12-03 12:14:32,494 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:14:48,443 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:14:48,478 - INFO -  * Restarting with stat
+2024-12-03 12:14:48,720 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:14:48,759 - INFO -  * Restarting with stat
+2024-12-03 12:14:48,809 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:14:48,980 - INFO - Database initialized successfully with admin user
+2024-12-03 12:14:48,988 - WARNING -  * Debugger is active!
+2024-12-03 12:14:48,992 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:14:49,085 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:14:49,247 - INFO - Database initialized successfully with admin user
+2024-12-03 12:14:49,254 - WARNING -  * Debugger is active!
+2024-12-03 12:14:49,257 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:15:36,604 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:15:36,640 - INFO -  * Restarting with stat
+2024-12-03 12:15:36,866 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:15:36,903 - INFO -  * Restarting with stat
+2024-12-03 12:15:36,920 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:15:37,110 - WARNING -  * Debugger is active!
+2024-12-03 12:15:37,113 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:15:37,238 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:15:37,384 - WARNING -  * Debugger is active!
+2024-12-03 12:15:37,387 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:15:55,371 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:15:55,409 - INFO -  * Restarting with stat
+2024-12-03 12:15:55,637 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:15:55,670 - INFO -  * Restarting with stat
+2024-12-03 12:15:55,692 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:15:55,837 - WARNING -  * Debugger is active!
+2024-12-03 12:15:55,839 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:15:55,960 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:15:56,104 - WARNING -  * Debugger is active!
+2024-12-03 12:15:56,108 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:23:20,822 - INFO - 127.0.0.1 - - [03/Dec/2024 12:23:20] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:23:25,800 - INFO - 127.0.0.1 - - [03/Dec/2024 12:23:25] "[32mPOST /login HTTP/1.1[0m" 302 -
+2024-12-03 12:23:26,114 - INFO - 127.0.0.1 - - [03/Dec/2024 12:23:26] "[32mGET /admin HTTP/1.1[0m" 302 -
+2024-12-03 12:23:26,376 - INFO - 127.0.0.1 - - [03/Dec/2024 12:23:26] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:23:33,142 - INFO - 127.0.0.1 - - [03/Dec/2024 12:23:33] "[32mPOST /login HTTP/1.1[0m" 302 -
+2024-12-03 12:23:33,462 - INFO - 127.0.0.1 - - [03/Dec/2024 12:23:33] "[32mGET /admin HTTP/1.1[0m" 302 -
+2024-12-03 12:23:33,712 - INFO - 127.0.0.1 - - [03/Dec/2024 12:23:33] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:24:33,198 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:24:33,235 - INFO -  * Restarting with stat
+2024-12-03 12:24:33,540 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:24:33,718 - WARNING -  * Debugger is active!
+2024-12-03 12:24:33,721 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:24:33,920 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:24:33,954 - INFO -  * Restarting with stat
+2024-12-03 12:24:34,251 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:24:34,409 - WARNING -  * Debugger is active!
+2024-12-03 12:24:34,411 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:25:46,609 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:25:46,646 - INFO -  * Restarting with stat
+2024-12-03 12:25:46,942 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:25:47,122 - WARNING -  * Debugger is active!
+2024-12-03 12:25:47,129 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:25:47,324 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:25:47,358 - INFO -  * Restarting with stat
+2024-12-03 12:25:47,709 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:25:47,852 - WARNING -  * Debugger is active!
+2024-12-03 12:25:47,856 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:26:03,779 - INFO - 127.0.0.1 - - [03/Dec/2024 12:26:03] "GET /api/docs HTTP/1.1" 200 -
+2024-12-03 12:26:04,091 - INFO - 127.0.0.1 - - [03/Dec/2024 12:26:04] "GET /flask-apispec/static/swagger-ui.css HTTP/1.1" 200 -
+2024-12-03 12:26:04,152 - INFO - 127.0.0.1 - - [03/Dec/2024 12:26:04] "GET /flask-apispec/static/swagger-ui-bundle.js HTTP/1.1" 200 -
+2024-12-03 12:26:04,202 - INFO - 127.0.0.1 - - [03/Dec/2024 12:26:04] "GET /flask-apispec/static/swagger-ui-standalone-preset.js HTTP/1.1" 200 -
+2024-12-03 12:26:04,282 - INFO - 127.0.0.1 - - [03/Dec/2024 12:26:04] "GET /api/swagger.json HTTP/1.1" 200 -
+2024-12-03 12:26:04,760 - INFO - 127.0.0.1 - - [03/Dec/2024 12:26:04] "GET /flask-apispec/static/favicon-32x32.png HTTP/1.1" 200 -
+2024-12-03 12:27:30,114 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:27:30,148 - INFO -  * Restarting with stat
+2024-12-03 12:27:30,410 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:27:30,446 - INFO -  * Restarting with stat
+2024-12-03 12:27:30,545 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:27:30,723 - WARNING -  * Debugger is active!
+2024-12-03 12:27:30,724 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:27:30,726 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:27:30,866 - WARNING -  * Debugger is active!
+2024-12-03 12:27:30,869 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:27:51,751 - INFO - 127.0.0.1 - - [03/Dec/2024 12:27:51] "[32mPOST /login HTTP/1.1[0m" 302 -
+2024-12-03 12:27:51,919 - INFO - 127.0.0.1 - - [03/Dec/2024 12:27:51] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:27:59,578 - INFO - 127.0.0.1 - - [03/Dec/2024 12:27:59] "[32mPOST /login HTTP/1.1[0m" 302 -
+2024-12-03 12:27:59,896 - INFO - 127.0.0.1 - - [03/Dec/2024 12:27:59] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:28:17,317 - INFO - 127.0.0.1 - - [03/Dec/2024 12:28:17] "[32mPOST /login HTTP/1.1[0m" 302 -
+2024-12-03 12:28:17,630 - INFO - 127.0.0.1 - - [03/Dec/2024 12:28:17] "[32mGET /admin HTTP/1.1[0m" 302 -
+2024-12-03 12:28:17,895 - INFO - 127.0.0.1 - - [03/Dec/2024 12:28:17] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:28:26,002 - INFO - 127.0.0.1 - - [03/Dec/2024 12:28:26] "[33mGET /ladmin HTTP/1.1[0m" 404 -
+2024-12-03 12:28:30,988 - INFO - 127.0.0.1 - - [03/Dec/2024 12:28:30] "[33mGET /l HTTP/1.1[0m" 404 -
+2024-12-03 12:30:28,901 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:30:29,098 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-03 12:30:29,099 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-03 12:30:29,099 - INFO -  * Restarting with stat
+2024-12-03 12:30:29,372 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:30:29,508 - WARNING -  * Debugger is active!
+2024-12-03 12:30:29,511 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:30:46,547 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:30:46,695 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-03 12:30:46,695 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-03 12:30:46,697 - INFO -  * Restarting with stat
+2024-12-03 12:30:46,963 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:30:47,102 - WARNING -  * Debugger is active!
+2024-12-03 12:30:47,105 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:30:53,638 - INFO - 127.0.0.1 - - [03/Dec/2024 12:30:53] "[32mGET / HTTP/1.1[0m" 302 -
+2024-12-03 12:30:53,892 - INFO - 127.0.0.1 - - [03/Dec/2024 12:30:53] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:31:02,328 - INFO - 127.0.0.1 - - [03/Dec/2024 12:31:02] "[32mPOST /login HTTP/1.1[0m" 302 -
+2024-12-03 12:31:02,634 - INFO - 127.0.0.1 - - [03/Dec/2024 12:31:02] "[32mGET /admin HTTP/1.1[0m" 302 -
+2024-12-03 12:31:02,899 - INFO - 127.0.0.1 - - [03/Dec/2024 12:31:02] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:31:11,788 - INFO - 127.0.0.1 - - [03/Dec/2024 12:31:11] "[32mPOST /login HTTP/1.1[0m" 302 -
+2024-12-03 12:31:12,099 - INFO - 127.0.0.1 - - [03/Dec/2024 12:31:12] "[32mGET /admin HTTP/1.1[0m" 302 -
+2024-12-03 12:31:12,363 - INFO - 127.0.0.1 - - [03/Dec/2024 12:31:12] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:32:33,395 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:32:33,435 - INFO -  * Restarting with stat
+2024-12-03 12:32:33,744 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:32:33,914 - WARNING -  * Debugger is active!
+2024-12-03 12:32:33,919 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:33:35,206 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:33:35,386 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-03 12:33:35,386 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-03 12:33:35,386 - INFO -  * Restarting with stat
+2024-12-03 12:33:35,722 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:33:35,863 - WARNING -  * Debugger is active!
+2024-12-03 12:33:35,866 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:33:45,738 - INFO - 127.0.0.1 - - [03/Dec/2024 12:33:45] "[32mPOST /login HTTP/1.1[0m" 302 -
+2024-12-03 12:33:45,912 - INFO - 127.0.0.1 - - [03/Dec/2024 12:33:45] "[32mGET /admin HTTP/1.1[0m" 302 -
+2024-12-03 12:33:46,054 - INFO - 127.0.0.1 - - [03/Dec/2024 12:33:46] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:36:56,577 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:36:56,733 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-03 12:36:56,733 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-03 12:36:56,734 - INFO -  * Restarting with stat
+2024-12-03 12:36:56,990 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:36:57,124 - WARNING -  * Debugger is active!
+2024-12-03 12:36:57,124 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:36:57,884 - INFO - 127.0.0.1 - - [03/Dec/2024 12:36:57] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:37:04,825 - INFO - 127.0.0.1 - - [03/Dec/2024 12:37:04] "[32mPOST /login HTTP/1.1[0m" 302 -
+2024-12-03 12:37:05,142 - INFO - 127.0.0.1 - - [03/Dec/2024 12:37:05] "[32mGET /admin HTTP/1.1[0m" 302 -
+2024-12-03 12:37:05,404 - INFO - 127.0.0.1 - - [03/Dec/2024 12:37:05] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:38:03,003 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:38:03,036 - INFO -  * Restarting with stat
+2024-12-03 12:38:03,326 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:38:03,488 - INFO - Database initialized successfully with admin user
+2024-12-03 12:38:03,494 - WARNING -  * Debugger is active!
+2024-12-03 12:38:03,501 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:38:13,417 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:38:13,582 - INFO - Database initialized successfully with admin user
+2024-12-03 12:38:13,588 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-03 12:38:13,595 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-03 12:38:13,596 - INFO -  * Restarting with stat
+2024-12-03 12:38:13,860 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:38:14,019 - INFO - Database initialized successfully with admin user
+2024-12-03 12:38:14,025 - WARNING -  * Debugger is active!
+2024-12-03 12:38:14,026 - INFO -  * Debugger PIN: 121-591-397
+2024-12-03 12:38:19,047 - INFO - 127.0.0.1 - - [03/Dec/2024 12:38:19] "[31m[1mPOST /login HTTP/1.1[0m" 415 -
+2024-12-03 12:38:21,448 - INFO - 127.0.0.1 - - [03/Dec/2024 12:38:21] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:38:29,416 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:38:29,582 - INFO - Database initialized successfully with admin user
+2024-12-03 12:38:29,595 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-03 12:38:29,595 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-03 12:38:29,595 - INFO -  * Restarting with stat
+2024-12-03 12:38:29,865 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:38:30,017 - INFO - Database initialized successfully with admin user
+2024-12-03 12:38:30,028 - WARNING -  * Debugger is active!
+2024-12-03 12:38:30,032 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:38:34,716 - INFO - 127.0.0.1 - - [03/Dec/2024 12:38:34] "POST /login HTTP/1.1" 200 -
+2024-12-03 12:38:34,905 - INFO - 127.0.0.1 - - [03/Dec/2024 12:38:34] "GET /admin HTTP/1.1" 200 -
+2024-12-03 12:38:38,346 - INFO - 127.0.0.1 - - [03/Dec/2024 12:38:38] "GET /admin HTTP/1.1" 200 -
+2024-12-03 12:38:40,103 - INFO - 127.0.0.1 - - [03/Dec/2024 12:38:40] "GET / HTTP/1.1" 200 -
+2024-12-03 12:40:42,817 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:40:42,851 - INFO -  * Restarting with stat
+2024-12-03 12:40:43,021 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:40:43,064 - INFO -  * Restarting with stat
+2024-12-03 12:40:43,144 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:40:43,317 - INFO - Database initialized successfully with admin user
+2024-12-03 12:40:43,323 - WARNING -  * Debugger is active!
+2024-12-03 12:40:43,326 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:40:43,366 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:40:43,503 - INFO - Database initialized successfully with admin user
+2024-12-03 12:40:43,509 - WARNING -  * Debugger is active!
+2024-12-03 12:40:43,512 - INFO -  * Debugger PIN: 121-591-397
+2024-12-03 12:41:21,537 - INFO - 127.0.0.1 - - [03/Dec/2024 12:41:21] "[32mGET / HTTP/1.1[0m" 302 -
+2024-12-03 12:41:21,791 - INFO - 127.0.0.1 - - [03/Dec/2024 12:41:21] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:41:25,905 - INFO - 127.0.0.1 - - [03/Dec/2024 12:41:25] "POST /login HTTP/1.1" 200 -
+2024-12-03 12:41:26,248 - INFO - 127.0.0.1 - - [03/Dec/2024 12:41:26] "GET /admin HTTP/1.1" 200 -
+2024-12-03 12:41:29,105 - INFO - 127.0.0.1 - - [03/Dec/2024 12:41:29] "GET /admin HTTP/1.1" 200 -
+2024-12-03 12:41:30,900 - INFO - 127.0.0.1 - - [03/Dec/2024 12:41:30] "GET /admin HTTP/1.1" 200 -
+2024-12-03 12:41:34,641 - INFO - 127.0.0.1 - - [03/Dec/2024 12:41:34] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-12-03 12:41:34,958 - INFO - 127.0.0.1 - - [03/Dec/2024 12:41:34] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:41:37,351 - INFO - 127.0.0.1 - - [03/Dec/2024 12:41:37] "GET /signup HTTP/1.1" 200 -
+2024-12-03 12:41:45,214 - INFO - 127.0.0.1 - - [03/Dec/2024 12:41:45] "POST /signup HTTP/1.1" 200 -
+2024-12-03 12:41:47,230 - INFO - 127.0.0.1 - - [03/Dec/2024 12:41:47] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:41:51,263 - INFO - 127.0.0.1 - - [03/Dec/2024 12:41:51] "POST /login HTTP/1.1" 200 -
+2024-12-03 12:41:51,455 - INFO - 127.0.0.1 - - [03/Dec/2024 12:41:51] "GET /admin HTTP/1.1" 200 -
+2024-12-03 12:41:56,619 - INFO - 127.0.0.1 - - [03/Dec/2024 12:41:56] "POST /admin/user/haytham/approve HTTP/1.1" 200 -
+2024-12-03 12:41:56,938 - INFO - 127.0.0.1 - - [03/Dec/2024 12:41:56] "GET /admin HTTP/1.1" 200 -
+2024-12-03 12:41:59,575 - INFO - 127.0.0.1 - - [03/Dec/2024 12:41:59] "POST /admin/user/haytham/toggle-disabled HTTP/1.1" 200 -
+2024-12-03 12:42:05,734 - INFO - 127.0.0.1 - - [03/Dec/2024 12:42:05] "GET /admin HTTP/1.1" 200 -
+2024-12-03 12:42:09,445 - INFO - 127.0.0.1 - - [03/Dec/2024 12:42:09] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-12-03 12:42:09,767 - INFO - 127.0.0.1 - - [03/Dec/2024 12:42:09] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:42:16,184 - INFO - 127.0.0.1 - - [03/Dec/2024 12:42:16] "[31m[1mPOST /login HTTP/1.1[0m" 403 -
+2024-12-03 12:42:21,965 - INFO - 127.0.0.1 - - [03/Dec/2024 12:42:21] "POST /login HTTP/1.1" 200 -
+2024-12-03 12:42:22,151 - INFO - 127.0.0.1 - - [03/Dec/2024 12:42:22] "GET /admin HTTP/1.1" 200 -
+2024-12-03 12:42:25,306 - INFO - 127.0.0.1 - - [03/Dec/2024 12:42:25] "POST /admin/user/haytham/toggle-disabled HTTP/1.1" 200 -
+2024-12-03 12:43:18,278 - INFO - 127.0.0.1 - - [03/Dec/2024 12:43:18] "GET /admin HTTP/1.1" 200 -
+2024-12-03 12:43:20,212 - INFO - 127.0.0.1 - - [03/Dec/2024 12:43:20] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-12-03 12:43:20,519 - INFO - 127.0.0.1 - - [03/Dec/2024 12:43:20] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:43:25,937 - INFO - 127.0.0.1 - - [03/Dec/2024 12:43:25] "POST /login HTTP/1.1" 200 -
+2024-12-03 12:43:26,266 - INFO - 127.0.0.1 - - [03/Dec/2024 12:43:26] "GET / HTTP/1.1" 200 -
+2024-12-03 12:44:34,387 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:44:34,422 - INFO -  * Restarting with stat
+2024-12-03 12:44:34,631 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:44:34,664 - INFO -  * Restarting with stat
+2024-12-03 12:44:34,707 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:44:34,887 - INFO - Database initialized successfully with admin user
+2024-12-03 12:44:34,887 - WARNING -  * Debugger is active!
+2024-12-03 12:44:34,893 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:44:34,954 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:44:35,100 - INFO - Database initialized successfully with admin user
+2024-12-03 12:44:35,105 - WARNING -  * Debugger is active!
+2024-12-03 12:44:35,109 - INFO -  * Debugger PIN: 121-591-397
+2024-12-03 12:45:00,255 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:45:00,287 - INFO -  * Restarting with stat
+2024-12-03 12:45:00,464 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:45:00,500 - INFO -  * Restarting with stat
+2024-12-03 12:45:00,574 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:45:00,753 - INFO - Database initialized successfully with admin user
+2024-12-03 12:45:00,759 - WARNING -  * Debugger is active!
+2024-12-03 12:45:00,759 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:45:00,781 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:45:00,919 - INFO - Database initialized successfully with admin user
+2024-12-03 12:45:00,926 - WARNING -  * Debugger is active!
+2024-12-03 12:45:00,926 - INFO -  * Debugger PIN: 121-591-397
+2024-12-03 12:45:54,078 - INFO - 127.0.0.1 - - [03/Dec/2024 12:45:54] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-12-03 12:45:54,333 - INFO - 127.0.0.1 - - [03/Dec/2024 12:45:54] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:45:59,911 - INFO - 127.0.0.1 - - [03/Dec/2024 12:45:59] "POST /login HTTP/1.1" 200 -
+2024-12-03 12:46:03,725 - INFO - 127.0.0.1 - - [03/Dec/2024 12:46:03] "POST /login HTTP/1.1" 200 -
+2024-12-03 12:46:06,368 - INFO - 127.0.0.1 - - [03/Dec/2024 12:46:06] "[31m[1mPOST /login HTTP/1.1[0m" 401 -
+2024-12-03 12:46:09,935 - INFO - 127.0.0.1 - - [03/Dec/2024 12:46:09] "POST /login HTTP/1.1" 200 -
+2024-12-03 12:46:15,588 - INFO - 127.0.0.1 - - [03/Dec/2024 12:46:15] "[31m[1mPOST /login HTTP/1.1[0m" 401 -
+2024-12-03 12:46:38,134 - INFO - 127.0.0.1 - - [03/Dec/2024 12:46:38] "POST /login HTTP/1.1" 200 -
+2024-12-03 12:47:45,974 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:47:46,005 - INFO -  * Restarting with stat
+2024-12-03 12:47:46,184 - INFO -  * Detected change in 'c:\\Users\\ASUS\\Desktop\\OP Generator\\app.py', reloading
+2024-12-03 12:47:46,216 - INFO -  * Restarting with stat
+2024-12-03 12:47:46,286 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:47:46,476 - INFO - Database initialized successfully with admin user
+2024-12-03 12:47:46,482 - WARNING -  * Debugger is active!
+2024-12-03 12:47:46,486 - INFO -  * Debugger PIN: 467-652-521
+2024-12-03 12:47:46,494 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 12:47:46,650 - INFO - Database initialized successfully with admin user
+2024-12-03 12:47:46,655 - WARNING -  * Debugger is active!
+2024-12-03 12:47:46,655 - INFO -  * Debugger PIN: 121-591-397
+2024-12-03 12:49:42,819 - INFO - 127.0.0.1 - - [03/Dec/2024 12:49:42] "POST /login HTTP/1.1" 200 -
+2024-12-03 12:49:43,008 - INFO - 127.0.0.1 - - [03/Dec/2024 12:49:43] "GET /admin HTTP/1.1" 200 -
+2024-12-03 12:49:46,463 - INFO - 127.0.0.1 - - [03/Dec/2024 12:49:46] "GET /admin HTTP/1.1" 200 -
+2024-12-03 12:49:48,343 - INFO - 127.0.0.1 - - [03/Dec/2024 12:49:48] "GET /admin HTTP/1.1" 200 -
+2024-12-03 12:49:49,258 - INFO - 127.0.0.1 - - [03/Dec/2024 12:49:49] "GET /admin HTTP/1.1" 200 -
+2024-12-03 12:49:50,053 - INFO - 127.0.0.1 - - [03/Dec/2024 12:49:50] "GET /admin HTTP/1.1" 200 -
+2024-12-03 12:49:51,992 - INFO - 127.0.0.1 - - [03/Dec/2024 12:49:51] "GET /admin HTTP/1.1" 200 -
+2024-12-03 12:49:53,645 - INFO - 127.0.0.1 - - [03/Dec/2024 12:49:53] "GET / HTTP/1.1" 200 -
+2024-12-03 12:49:58,522 - INFO - 127.0.0.1 - - [03/Dec/2024 12:49:58] "GET /admin HTTP/1.1" 200 -
+2024-12-03 12:50:00,384 - INFO - 127.0.0.1 - - [03/Dec/2024 12:50:00] "GET /admin HTTP/1.1" 200 -
+2024-12-03 12:50:04,227 - INFO - 127.0.0.1 - - [03/Dec/2024 12:50:04] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-12-03 12:50:04,536 - INFO - 127.0.0.1 - - [03/Dec/2024 12:50:04] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:50:11,242 - INFO - 127.0.0.1 - - [03/Dec/2024 12:50:11] "[31m[1mPOST /login HTTP/1.1[0m" 401 -
+2024-12-03 12:50:12,841 - INFO - 127.0.0.1 - - [03/Dec/2024 12:50:12] "GET /signup HTTP/1.1" 200 -
+2024-12-03 12:50:19,778 - INFO - 127.0.0.1 - - [03/Dec/2024 12:50:19] "POST /signup HTTP/1.1" 200 -
+2024-12-03 12:50:22,102 - INFO - 127.0.0.1 - - [03/Dec/2024 12:50:22] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:50:27,416 - INFO - 127.0.0.1 - - [03/Dec/2024 12:50:27] "[31m[1mPOST /login HTTP/1.1[0m" 403 -
+2024-12-03 12:50:36,150 - INFO - 127.0.0.1 - - [03/Dec/2024 12:50:36] "POST /login HTTP/1.1" 200 -
+2024-12-03 12:50:36,347 - INFO - 127.0.0.1 - - [03/Dec/2024 12:50:36] "GET /admin HTTP/1.1" 200 -
+2024-12-03 12:50:42,217 - INFO - 127.0.0.1 - - [03/Dec/2024 12:50:42] "POST /admin/user/haytham/approve HTTP/1.1" 200 -
+2024-12-03 12:50:42,529 - INFO - 127.0.0.1 - - [03/Dec/2024 12:50:42] "GET /admin HTTP/1.1" 200 -
+2024-12-03 12:50:43,797 - INFO - 127.0.0.1 - - [03/Dec/2024 12:50:43] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-12-03 12:50:44,103 - INFO - 127.0.0.1 - - [03/Dec/2024 12:50:44] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:50:50,302 - INFO - 127.0.0.1 - - [03/Dec/2024 12:50:50] "POST /login HTTP/1.1" 200 -
+2024-12-03 12:50:50,619 - INFO - 127.0.0.1 - - [03/Dec/2024 12:50:50] "GET / HTTP/1.1" 200 -
+2024-12-03 12:50:55,114 - INFO - 127.0.0.1 - - [03/Dec/2024 12:50:55] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-12-03 12:50:55,424 - INFO - 127.0.0.1 - - [03/Dec/2024 12:50:55] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:51:00,334 - INFO - 127.0.0.1 - - [03/Dec/2024 12:51:00] "POST /login HTTP/1.1" 200 -
+2024-12-03 12:51:00,663 - INFO - 127.0.0.1 - - [03/Dec/2024 12:51:00] "GET /admin HTTP/1.1" 200 -
+2024-12-03 12:51:24,014 - INFO - 127.0.0.1 - - [03/Dec/2024 12:51:24] "POST /admin/user/haytham/set-vacation HTTP/1.1" 200 -
+2024-12-03 12:51:26,014 - INFO - 127.0.0.1 - - [03/Dec/2024 12:51:26] "POST /admin/user/haytham/set-vacation HTTP/1.1" 200 -
+2024-12-03 12:51:27,989 - INFO - 127.0.0.1 - - [03/Dec/2024 12:51:27] "GET /admin HTTP/1.1" 200 -
+2024-12-03 12:51:41,310 - INFO - 127.0.0.1 - - [03/Dec/2024 12:51:41] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-12-03 12:51:41,556 - INFO - 127.0.0.1 - - [03/Dec/2024 12:51:41] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:51:49,617 - INFO - 127.0.0.1 - - [03/Dec/2024 12:51:49] "[31m[1mPOST /login HTTP/1.1[0m" 403 -
+2024-12-03 12:52:04,403 - INFO - 127.0.0.1 - - [03/Dec/2024 12:52:04] "POST /login HTTP/1.1" 200 -
+2024-12-03 12:52:04,572 - INFO - 127.0.0.1 - - [03/Dec/2024 12:52:04] "GET /admin HTTP/1.1" 200 -
+2024-12-03 12:52:19,637 - INFO - 127.0.0.1 - - [03/Dec/2024 12:52:19] "[31m[1mPOST /admin/user/haytham/set-vacation HTTP/1.1[0m" 400 -
+2024-12-03 12:52:22,315 - INFO - 127.0.0.1 - - [03/Dec/2024 12:52:22] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-12-03 12:52:22,577 - INFO - 127.0.0.1 - - [03/Dec/2024 12:52:22] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:52:29,040 - INFO - 127.0.0.1 - - [03/Dec/2024 12:52:29] "[31m[1mPOST /login HTTP/1.1[0m" 403 -
+2024-12-03 12:53:52,547 - INFO - 127.0.0.1 - - [03/Dec/2024 12:53:52] "POST /login HTTP/1.1" 200 -
+2024-12-03 12:53:52,728 - INFO - 127.0.0.1 - - [03/Dec/2024 12:53:52] "GET /admin HTTP/1.1" 200 -
+2024-12-03 12:54:10,857 - INFO - 127.0.0.1 - - [03/Dec/2024 12:54:10] "POST /admin/user/haytham/set-vacation HTTP/1.1" 200 -
+2024-12-03 12:54:20,720 - INFO - 127.0.0.1 - - [03/Dec/2024 12:54:20] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-12-03 12:54:21,038 - INFO - 127.0.0.1 - - [03/Dec/2024 12:54:21] "GET /login HTTP/1.1" 200 -
+2024-12-03 12:54:31,139 - INFO - 127.0.0.1 - - [03/Dec/2024 12:54:31] "POST /login HTTP/1.1" 200 -
+2024-12-03 12:54:31,460 - INFO - 127.0.0.1 - - [03/Dec/2024 12:54:31] "GET / HTTP/1.1" 200 -
+2024-12-03 12:54:35,077 - INFO - 127.0.0.1 - - [03/Dec/2024 12:54:35] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-12-03 12:54:35,392 - INFO - 127.0.0.1 - - [03/Dec/2024 12:54:35] "GET /login HTTP/1.1" 200 -
+2024-12-03 13:41:41,589 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 13:41:41,770 - INFO - Database initialized successfully with admin user
+2024-12-03 13:41:41,782 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-03 13:41:41,782 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-03 13:41:41,783 - INFO -  * Restarting with stat
+2024-12-03 13:41:42,096 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 13:41:42,236 - INFO - Database initialized successfully with admin user
+2024-12-03 13:41:42,242 - WARNING -  * Debugger is active!
+2024-12-03 13:41:42,245 - INFO -  * Debugger PIN: 967-593-981
+2024-12-03 13:41:45,582 - INFO - 127.0.0.1 - - [03/Dec/2024 13:41:45] "POST /login HTTP/1.1" 200 -
+2024-12-03 13:41:45,779 - INFO - 127.0.0.1 - - [03/Dec/2024 13:41:45] "GET /admin HTTP/1.1" 200 -
+2024-12-03 13:41:49,014 - INFO - 127.0.0.1 - - [03/Dec/2024 13:41:49] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-12-03 13:41:49,337 - INFO - 127.0.0.1 - - [03/Dec/2024 13:41:49] "GET /login HTTP/1.1" 200 -
+2024-12-03 13:42:57,475 - INFO - 127.0.0.1 - - [03/Dec/2024 13:42:57] "GET /signup HTTP/1.1" 200 -
+2024-12-03 13:43:09,261 - INFO - 127.0.0.1 - - [03/Dec/2024 13:43:09] "POST /signup HTTP/1.1" 200 -
+2024-12-03 13:43:11,591 - INFO - 127.0.0.1 - - [03/Dec/2024 13:43:11] "GET /login HTTP/1.1" 200 -
+2024-12-03 13:43:16,520 - INFO - 127.0.0.1 - - [03/Dec/2024 13:43:16] "POST /login HTTP/1.1" 200 -
+2024-12-03 13:43:16,854 - INFO - 127.0.0.1 - - [03/Dec/2024 13:43:16] "GET /admin HTTP/1.1" 200 -
+2024-12-03 13:43:21,935 - INFO - 127.0.0.1 - - [03/Dec/2024 13:43:21] "POST /admin/user/haytham/approve HTTP/1.1" 200 -
+2024-12-03 13:43:22,251 - INFO - 127.0.0.1 - - [03/Dec/2024 13:43:22] "GET /admin HTTP/1.1" 200 -
+2024-12-03 13:58:37,514 - INFO - 127.0.0.1 - - [03/Dec/2024 13:58:37] "GET /admin HTTP/1.1" 200 -
+2024-12-03 13:58:41,038 - INFO - 127.0.0.1 - - [03/Dec/2024 13:58:41] "POST /admin/user/haytham/toggle-disabled HTTP/1.1" 200 -
+2024-12-03 13:58:43,753 - INFO - 127.0.0.1 - - [03/Dec/2024 13:58:43] "GET /admin HTTP/1.1" 200 -
+2024-12-03 13:59:15,923 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 13:59:16,117 - INFO - Database initialized successfully with admin user
+2024-12-03 13:59:16,132 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-03 13:59:16,132 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-03 13:59:16,133 - INFO -  * Restarting with stat
+2024-12-03 13:59:16,459 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 13:59:16,610 - INFO - Database initialized successfully with admin user
+2024-12-03 13:59:16,615 - WARNING -  * Debugger is active!
+2024-12-03 13:59:16,619 - INFO -  * Debugger PIN: 967-593-981
+2024-12-03 13:59:24,829 - INFO - 127.0.0.1 - - [03/Dec/2024 13:59:24] "[32mGET /admin HTTP/1.1[0m" 302 -
+2024-12-03 13:59:25,102 - INFO - 127.0.0.1 - - [03/Dec/2024 13:59:25] "GET /login HTTP/1.1" 200 -
+2024-12-03 13:59:36,826 - INFO - 127.0.0.1 - - [03/Dec/2024 13:59:36] "GET /signup HTTP/1.1" 200 -
+2024-12-03 13:59:43,619 - INFO - 127.0.0.1 - - [03/Dec/2024 13:59:43] "POST /signup HTTP/1.1" 200 -
+2024-12-03 13:59:45,635 - INFO - 127.0.0.1 - - [03/Dec/2024 13:59:45] "GET /login HTTP/1.1" 200 -
+2024-12-03 13:59:51,301 - INFO - 127.0.0.1 - - [03/Dec/2024 13:59:51] "POST /login HTTP/1.1" 200 -
+2024-12-03 13:59:51,483 - INFO - 127.0.0.1 - - [03/Dec/2024 13:59:51] "GET /admin HTTP/1.1" 200 -
+2024-12-03 13:59:55,997 - INFO - 127.0.0.1 - - [03/Dec/2024 13:59:55] "POST /admin/user/haytham/approve HTTP/1.1" 200 -
+2024-12-03 13:59:56,317 - INFO - 127.0.0.1 - - [03/Dec/2024 13:59:56] "GET /admin HTTP/1.1" 200 -
+2024-12-03 13:59:58,233 - INFO - 127.0.0.1 - - [03/Dec/2024 13:59:58] "POST /admin/user/haytham/toggle-disabled HTTP/1.1" 200 -
+2024-12-03 14:00:00,805 - INFO - 127.0.0.1 - - [03/Dec/2024 14:00:00] "POST /admin/user/haytham/toggle-disabled HTTP/1.1" 200 -
+2024-12-03 14:00:02,621 - INFO - 127.0.0.1 - - [03/Dec/2024 14:00:02] "POST /admin/user/haytham/toggle-disabled HTTP/1.1" 200 -
+2024-12-03 14:00:05,739 - INFO - 127.0.0.1 - - [03/Dec/2024 14:00:05] "POST /admin/user/haytham/toggle-disabled HTTP/1.1" 200 -
+2024-12-03 14:00:06,838 - INFO - 127.0.0.1 - - [03/Dec/2024 14:00:06] "GET /admin HTTP/1.1" 200 -
+2024-12-03 14:00:09,388 - INFO - 127.0.0.1 - - [03/Dec/2024 14:00:09] "GET /admin HTTP/1.1" 200 -
+2024-12-03 14:00:12,664 - INFO - 127.0.0.1 - - [03/Dec/2024 14:00:12] "POST /admin/user/haytham/toggle-disabled HTTP/1.1" 200 -
+2024-12-03 14:00:13,940 - INFO - 127.0.0.1 - - [03/Dec/2024 14:00:13] "GET /admin HTTP/1.1" 200 -
+2024-12-03 14:00:20,619 - INFO - 127.0.0.1 - - [03/Dec/2024 14:00:20] "POST /admin/user/haytham/toggle-disabled HTTP/1.1" 200 -
+2024-12-03 14:00:23,036 - INFO - 127.0.0.1 - - [03/Dec/2024 14:00:23] "POST /admin/user/haytham/toggle-disabled HTTP/1.1" 200 -
+2024-12-03 14:07:31,503 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 14:07:31,687 - INFO - Database initialized successfully with admin user
+2024-12-03 14:07:31,700 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-03 14:07:31,701 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-03 14:07:31,701 - INFO -  * Restarting with stat
+2024-12-03 14:07:32,064 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 14:07:32,219 - INFO - Database initialized successfully with admin user
+2024-12-03 14:07:32,226 - WARNING -  * Debugger is active!
+2024-12-03 14:07:32,230 - INFO -  * Debugger PIN: 967-593-981
+2024-12-03 14:07:47,185 - INFO - 127.0.0.1 - - [03/Dec/2024 14:07:47] "[32mGET / HTTP/1.1[0m" 302 -
+2024-12-03 14:07:47,448 - INFO - 127.0.0.1 - - [03/Dec/2024 14:07:47] "GET /login HTTP/1.1" 200 -
+2024-12-03 14:07:49,984 - INFO - 127.0.0.1 - - [03/Dec/2024 14:07:49] "GET /signup HTTP/1.1" 200 -
+2024-12-03 14:08:01,986 - INFO - 127.0.0.1 - - [03/Dec/2024 14:08:01] "POST /signup HTTP/1.1" 200 -
+2024-12-03 14:08:04,011 - INFO - 127.0.0.1 - - [03/Dec/2024 14:08:04] "GET /login HTTP/1.1" 200 -
+2024-12-03 14:08:09,553 - INFO - 127.0.0.1 - - [03/Dec/2024 14:08:09] "POST /login HTTP/1.1" 200 -
+2024-12-03 14:08:09,732 - INFO - 127.0.0.1 - - [03/Dec/2024 14:08:09] "GET /admin HTTP/1.1" 200 -
+2024-12-03 14:08:13,197 - INFO - 127.0.0.1 - - [03/Dec/2024 14:08:13] "POST /admin/user/haytham/approve HTTP/1.1" 200 -
+2024-12-03 14:08:13,520 - INFO - 127.0.0.1 - - [03/Dec/2024 14:08:13] "GET /admin HTTP/1.1" 200 -
+2024-12-03 14:08:18,032 - INFO - 127.0.0.1 - - [03/Dec/2024 14:08:18] "POST /admin/user/haytham/toggle-disabled HTTP/1.1" 200 -
+2024-12-03 14:08:19,758 - INFO - 127.0.0.1 - - [03/Dec/2024 14:08:19] "GET /admin HTTP/1.1" 200 -
+2024-12-03 14:08:33,652 - INFO - 127.0.0.1 - - [03/Dec/2024 14:08:33] "GET / HTTP/1.1" 200 -
+2024-12-03 14:08:41,717 - INFO - 127.0.0.1 - - [03/Dec/2024 14:08:41] "GET / HTTP/1.1" 200 -
+2024-12-03 14:08:43,494 - INFO - 127.0.0.1 - - [03/Dec/2024 14:08:43] "GET /admin HTTP/1.1" 200 -
+2024-12-03 14:08:50,207 - INFO - 127.0.0.1 - - [03/Dec/2024 14:08:50] "[32mGET / HTTP/1.1[0m" 302 -
+2024-12-03 14:08:50,215 - INFO - 127.0.0.1 - - [03/Dec/2024 14:08:50] "GET /login HTTP/1.1" 200 -
+2024-12-03 14:08:55,555 - INFO - 127.0.0.1 - - [03/Dec/2024 14:08:55] "POST /login HTTP/1.1" 200 -
+2024-12-03 14:08:55,887 - INFO - 127.0.0.1 - - [03/Dec/2024 14:08:55] "GET /admin HTTP/1.1" 200 -
+2024-12-03 14:08:56,025 - INFO - 127.0.0.1 - - [03/Dec/2024 14:08:56] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2024-12-03 14:09:04,296 - INFO - 127.0.0.1 - - [03/Dec/2024 14:09:04] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-12-03 14:09:04,598 - INFO - 127.0.0.1 - - [03/Dec/2024 14:09:04] "GET /login HTTP/1.1" 200 -
+2024-12-03 14:09:14,084 - INFO - 127.0.0.1 - - [03/Dec/2024 14:09:14] "[31m[1mPOST /login HTTP/1.1[0m" 403 -
+2024-12-03 14:09:21,439 - INFO - 127.0.0.1 - - [03/Dec/2024 14:09:21] "POST /admin/user/haytham/toggle-disabled HTTP/1.1" 200 -
+2024-12-03 14:09:22,387 - INFO - 127.0.0.1 - - [03/Dec/2024 14:09:22] "GET /admin HTTP/1.1" 200 -
+2024-12-03 14:09:25,548 - INFO - 127.0.0.1 - - [03/Dec/2024 14:09:25] "POST /login HTTP/1.1" 200 -
+2024-12-03 14:09:25,866 - INFO - 127.0.0.1 - - [03/Dec/2024 14:09:25] "GET / HTTP/1.1" 200 -
+2024-12-03 17:10:35,906 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 17:10:35,995 - ERROR - Error initializing database: ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Could not drop object 'users' because it is referenced by a FOREIGN KEY constraint. (3726) (SQLExecDirectW)")
+2024-12-03 17:11:20,307 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 17:11:20,491 - INFO - Database initialized successfully with admin user
+2024-12-03 17:11:20,504 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-03 17:11:20,504 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-03 17:11:20,505 - INFO -  * Restarting with stat
+2024-12-03 17:11:20,769 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 17:11:20,941 - INFO - Database initialized successfully with admin user
+2024-12-03 17:11:20,947 - WARNING -  * Debugger is active!
+2024-12-03 17:11:20,950 - INFO -  * Debugger PIN: 143-687-146
+2024-12-03 17:11:27,816 - INFO - 127.0.0.1 - - [03/Dec/2024 17:11:27] "GET /login HTTP/1.1" 200 -
+2024-12-03 17:11:32,950 - INFO - 127.0.0.1 - - [03/Dec/2024 17:11:32] "GET /signup HTTP/1.1" 200 -
+2024-12-03 17:11:47,057 - INFO - 127.0.0.1 - - [03/Dec/2024 17:11:47] "POST /signup HTTP/1.1" 200 -
+2024-12-03 17:11:49,085 - INFO - 127.0.0.1 - - [03/Dec/2024 17:11:49] "GET /login HTTP/1.1" 200 -
+2024-12-03 17:11:57,773 - INFO - 127.0.0.1 - - [03/Dec/2024 17:11:57] "POST /login HTTP/1.1" 200 -
+2024-12-03 17:11:58,010 - INFO - 127.0.0.1 - - [03/Dec/2024 17:11:58] "GET /admin HTTP/1.1" 200 -
+2024-12-03 17:12:01,107 - INFO - 127.0.0.1 - - [03/Dec/2024 17:12:01] "POST /admin/user/haytham/approve HTTP/1.1" 200 -
+2024-12-03 17:12:01,432 - INFO - 127.0.0.1 - - [03/Dec/2024 17:12:01] "GET /admin HTTP/1.1" 200 -
+2024-12-03 17:41:50,988 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 17:41:51,098 - ERROR - Error initializing database: ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Could not drop object 'users' because it is referenced by a FOREIGN KEY constraint. (3726) (SQLExecDirectW)")
+2024-12-03 17:42:14,966 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 17:42:15,195 - INFO - Database initialized successfully with admin user
+2024-12-03 17:42:15,211 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-03 17:42:15,211 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-03 17:42:15,212 - INFO -  * Restarting with stat
+2024-12-03 17:42:15,480 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 17:42:15,622 - INFO - Database initialized successfully with admin user
+2024-12-03 17:42:15,628 - WARNING -  * Debugger is active!
+2024-12-03 17:42:15,631 - INFO -  * Debugger PIN: 143-687-146
+2024-12-03 17:42:33,960 - INFO - 127.0.0.1 - - [03/Dec/2024 17:42:33] "POST /login HTTP/1.1" 200 -
+2024-12-03 17:42:34,151 - INFO - 127.0.0.1 - - [03/Dec/2024 17:42:34] "GET /admin HTTP/1.1" 200 -
+2024-12-03 17:42:37,406 - INFO - 127.0.0.1 - - [03/Dec/2024 17:42:37] "GET / HTTP/1.1" 200 -
+2024-12-03 17:42:43,975 - INFO - 127.0.0.1 - - [03/Dec/2024 17:42:43] "POST /generate HTTP/1.1" 200 -
+2024-12-03 17:42:49,551 - INFO - 127.0.0.1 - - [03/Dec/2024 17:42:49] "GET /search?op_number=1 HTTP/1.1" 200 -
+2024-12-03 17:43:02,430 - INFO - 127.0.0.1 - - [03/Dec/2024 17:43:02] "GET /api/docs HTTP/1.1" 200 -
+2024-12-03 17:43:02,766 - INFO - 127.0.0.1 - - [03/Dec/2024 17:43:02] "GET /flask-apispec/static/swagger-ui.css HTTP/1.1" 200 -
+2024-12-03 17:43:02,828 - INFO - 127.0.0.1 - - [03/Dec/2024 17:43:02] "GET /flask-apispec/static/swagger-ui-bundle.js HTTP/1.1" 200 -
+2024-12-03 17:43:02,906 - INFO - 127.0.0.1 - - [03/Dec/2024 17:43:02] "GET /flask-apispec/static/swagger-ui-standalone-preset.js HTTP/1.1" 200 -
+2024-12-03 17:43:03,234 - INFO - 127.0.0.1 - - [03/Dec/2024 17:43:03] "GET /api/swagger.json HTTP/1.1" 200 -
+2024-12-03 17:43:03,316 - INFO - 127.0.0.1 - - [03/Dec/2024 17:43:03] "GET /flask-apispec/static/favicon-32x32.png HTTP/1.1" 200 -
+2024-12-03 17:43:23,865 - INFO - 127.0.0.1 - - [03/Dec/2024 17:43:23] "POST /api/user HTTP/1.1" 200 -
+2024-12-03 17:43:41,392 - INFO - 127.0.0.1 - - [03/Dec/2024 17:43:41] "[35m[1mPOST /api/token HTTP/1.1[0m" 500 -
+2024-12-03 17:51:49,788 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 17:53:26,591 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 17:53:26,732 - INFO - Database initialized successfully with admin user
+2024-12-03 17:53:26,746 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-03 17:53:26,746 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-03 17:53:26,747 - INFO -  * Restarting with stat
+2024-12-03 17:53:26,984 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 17:53:27,107 - INFO - Database initialized successfully with admin user
+2024-12-03 17:53:27,113 - WARNING -  * Debugger is active!
+2024-12-03 17:53:27,115 - INFO -  * Debugger PIN: 143-687-146
+2024-12-03 17:53:39,905 - INFO - 127.0.0.1 - - [03/Dec/2024 17:53:39] "[32mGET / HTTP/1.1[0m" 302 -
+2024-12-03 17:53:40,166 - INFO - 127.0.0.1 - - [03/Dec/2024 17:53:40] "GET /login HTTP/1.1" 200 -
+2024-12-03 17:53:41,640 - INFO - 127.0.0.1 - - [03/Dec/2024 17:53:41] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2024-12-03 17:53:43,148 - INFO - 127.0.0.1 - - [03/Dec/2024 17:53:43] "GET /signup HTTP/1.1" 200 -
+2024-12-03 17:53:51,049 - INFO - 127.0.0.1 - - [03/Dec/2024 17:53:51] "POST /signup HTTP/1.1" 200 -
+2024-12-03 17:53:53,067 - INFO - 127.0.0.1 - - [03/Dec/2024 17:53:53] "GET /login HTTP/1.1" 200 -
+2024-12-03 17:53:57,112 - INFO - 127.0.0.1 - - [03/Dec/2024 17:53:57] "POST /login HTTP/1.1" 200 -
+2024-12-03 17:53:57,318 - INFO - 127.0.0.1 - - [03/Dec/2024 17:53:57] "GET /admin HTTP/1.1" 200 -
+2024-12-03 17:54:00,830 - INFO - 127.0.0.1 - - [03/Dec/2024 17:54:00] "POST /admin/user/haytham/approve HTTP/1.1" 200 -
+2024-12-03 17:54:01,173 - INFO - 127.0.0.1 - - [03/Dec/2024 17:54:01] "GET /admin HTTP/1.1" 200 -
+2024-12-03 17:54:06,952 - INFO - 127.0.0.1 - - [03/Dec/2024 17:54:06] "GET / HTTP/1.1" 200 -
+2024-12-03 17:54:14,759 - ERROR - Database error during generation: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OpNumberSequence'. (208) (SQLExecDirectW)")
+2024-12-03 17:54:14,760 - INFO - 127.0.0.1 - - [03/Dec/2024 17:54:14] "[35m[1mPOST /generate HTTP/1.1[0m" 500 -
+2024-12-03 17:54:17,458 - ERROR - Database error during generation: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OpNumberSequence'. (208) (SQLExecDirectW)")
+2024-12-03 17:54:17,459 - INFO - 127.0.0.1 - - [03/Dec/2024 17:54:17] "[35m[1mPOST /generate HTTP/1.1[0m" 500 -
+2024-12-03 17:56:50,853 - ERROR - Database error during generation: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OpNumberSequence'. (208) (SQLExecDirectW)")
+2024-12-03 17:56:50,853 - INFO - 127.0.0.1 - - [03/Dec/2024 17:56:50] "[35m[1mPOST /generate HTTP/1.1[0m" 500 -
+2024-12-03 17:57:02,351 - INFO - 127.0.0.1 - - [03/Dec/2024 17:57:02] "GET /search?op_number=1 HTTP/1.1" 200 -
+2024-12-03 18:00:12,524 - ERROR - Database error during generation: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OpNumberSequence'. (208) (SQLExecDirectW)")
+2024-12-03 18:00:12,524 - INFO - 127.0.0.1 - - [03/Dec/2024 18:00:12] "[35m[1mPOST /generate HTTP/1.1[0m" 500 -
+2024-12-03 18:56:19,847 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 18:56:20,016 - INFO - Database initialized successfully with admin user
+2024-12-03 18:56:20,028 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-03 18:56:20,028 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-03 18:56:20,029 - INFO -  * Restarting with stat
+2024-12-03 18:56:20,314 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 18:56:20,451 - INFO - Database initialized successfully with admin user
+2024-12-03 18:56:20,457 - WARNING -  * Debugger is active!
+2024-12-03 18:56:20,460 - INFO -  * Debugger PIN: 143-687-146
+2024-12-03 18:56:24,266 - INFO - 127.0.0.1 - - [03/Dec/2024 18:56:24] "[32mGET / HTTP/1.1[0m" 302 -
+2024-12-03 18:56:24,538 - INFO - 127.0.0.1 - - [03/Dec/2024 18:56:24] "GET /login HTTP/1.1" 200 -
+2024-12-03 18:56:29,108 - INFO - 127.0.0.1 - - [03/Dec/2024 18:56:29] "POST /login HTTP/1.1" 200 -
+2024-12-03 18:56:29,465 - INFO - 127.0.0.1 - - [03/Dec/2024 18:56:29] "GET /admin HTTP/1.1" 200 -
+2024-12-03 18:56:33,025 - INFO - 127.0.0.1 - - [03/Dec/2024 18:56:33] "GET / HTTP/1.1" 200 -
+2024-12-03 18:56:39,756 - INFO - 127.0.0.1 - - [03/Dec/2024 18:56:39] "POST /generate HTTP/1.1" 200 -
+2024-12-03 18:56:43,604 - INFO - 127.0.0.1 - - [03/Dec/2024 18:56:43] "GET /search?op_number=1 HTTP/1.1" 200 -
+2024-12-03 18:56:47,010 - INFO - 127.0.0.1 - - [03/Dec/2024 18:56:47] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-12-03 18:56:47,260 - INFO - 127.0.0.1 - - [03/Dec/2024 18:56:47] "GET /login HTTP/1.1" 200 -
+2024-12-03 20:43:07,426 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 20:43:07,600 - INFO - Database initialized successfully with admin user
+2024-12-03 20:43:07,615 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-03 20:43:07,615 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-03 20:43:07,616 - INFO -  * Restarting with stat
+2024-12-03 20:43:07,918 - INFO - Loaded API token from .env: testtoken123
+2024-12-03 20:43:08,076 - INFO - Database initialized successfully with admin user
+2024-12-03 20:43:08,082 - WARNING -  * Debugger is active!
+2024-12-03 20:43:08,085 - INFO -  * Debugger PIN: 143-687-146
+2024-12-03 20:43:08,250 - INFO - 127.0.0.1 - - [03/Dec/2024 20:43:08] "GET /login HTTP/1.1" 200 -
+2024-12-03 20:43:12,644 - INFO - 127.0.0.1 - - [03/Dec/2024 20:43:12] "POST /login HTTP/1.1" 200 -
+2024-12-03 20:43:12,980 - INFO - 127.0.0.1 - - [03/Dec/2024 20:43:12] "GET /admin HTTP/1.1" 200 -
+2024-12-03 20:43:21,989 - INFO - 127.0.0.1 - - [03/Dec/2024 20:43:21] "POST /admin/api-user HTTP/1.1" 200 -
+2024-12-03 20:43:22,306 - INFO - 127.0.0.1 - - [03/Dec/2024 20:43:22] "GET /admin HTTP/1.1" 200 -
+2024-12-03 20:43:25,588 - INFO - 127.0.0.1 - - [03/Dec/2024 20:43:25] "POST /admin/api-user/haytham/token HTTP/1.1" 200 -
+2024-12-03 20:43:25,910 - INFO - 127.0.0.1 - - [03/Dec/2024 20:43:25] "GET /admin HTTP/1.1" 200 -
+2024-12-03 20:46:23,228 - INFO - 127.0.0.1 - - [03/Dec/2024 20:46:23] "DELETE /admin/api-user/haytham HTTP/1.1" 200 -
+2024-12-03 20:46:23,480 - INFO - 127.0.0.1 - - [03/Dec/2024 20:46:23] "GET /admin HTTP/1.1" 200 -
+2024-12-03 20:46:30,158 - INFO - 127.0.0.1 - - [03/Dec/2024 20:46:30] "GET / HTTP/1.1" 200 -
+2024-12-03 20:46:35,239 - INFO - 127.0.0.1 - - [03/Dec/2024 20:46:35] "GET /admin HTTP/1.1" 200 -
