@@ -82,7 +82,7 @@ class TokenResponseSchema(Schema):
     message = fields.Str()
 
 class UserRequestSchema(Schema):
-    username = fields.Str(required=True, metadata={'description': 'Username'})
+    username = fields.Str(required(True, metadata={'description': 'Username'})
     password = fields.Str(required=True, metadata={'description': 'Password'})
     full_name = fields.Str(required=True, metadata={'description': 'Full Name'})
 
@@ -276,7 +276,7 @@ class RecordSearchResource(MethodResource, Resource):
     @use_kwargs({
         'name': fields.Str(required=False, metadata={'description': 'Name to search for'}),
         'id1': fields.Str(required=False, metadata={'description': 'First identifier to search for'}),
-        'id2': fields.Str(required=False, metadata={'description': 'Second identifier to search for'})
+        'id2': fields.Str(required(False, metadata={'description': 'Second identifier to search for'})
     }, location='query')
     @marshal_with(RecordListResponseSchema)
     @require_api_token
@@ -454,11 +454,15 @@ def login():
         # Log IP address and computer name
         ip_address = request.remote_addr
         computer_name = request.user_agent.platform
-        cursor.execute('''
-            INSERT INTO sessions (user_id, ip_address, computer_name, login_time)
-            VALUES (?, ?, ?, ?)
-        ''', (user[0], ip_address, computer_name, datetime.now()))
-        conn.commit()
+        try:
+            cursor.execute('''
+                INSERT INTO sessions (user_id, ip_address, computer_name, login_time)
+                VALUES (?, ?, ?, ?)
+            ''', (user[0], ip_address, computer_name, datetime.now()))
+            conn.commit()
+        except Exception as e:
+            logging.error(f"Error inserting session: {str(e)}")
+            return jsonify({'error': 'Database error occurred'}), 500
         
         if request.is_json:
             return jsonify({'success': True, 'message': 'Login successful', 'is_admin': bool(user[2]), 'full_name': user[3]})
