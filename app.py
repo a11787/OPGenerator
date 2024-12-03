@@ -113,7 +113,6 @@ def init_db():
             IF OBJECT_ID('records', 'U') IS NOT NULL DROP TABLE records;
             IF OBJECT_ID('users', 'U') IS NOT NULL DROP TABLE users;
             IF OBJECT_ID('api_users', 'U') IS NOT NULL DROP TABLE api_users;
-            IF OBJECT_ID('sessions', 'U') IS NOT NULL DROP TABLE sessions;
         ''')
         
         # Create records table
@@ -406,9 +405,6 @@ docs.register(RecordSearchResource)
 docs.register(TokenResource)
 docs.register(UserResource)
 
-def get_computer_name():
-    return request.headers.get('X-Computer-Name', 'Unknown')
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
@@ -455,11 +451,9 @@ def login():
         session['username'] = username
         session['full_name'] = user[3]
         
+        # Log IP address and computer name
         ip_address = request.remote_addr
-        computer_name = get_computer_name()
-        logging.info(f"User {username} logged in from IP {ip_address} and computer {computer_name}")
-        
-        # Log session information in the sessions table
+        computer_name = request.user_agent.platform
         cursor.execute('''
             INSERT INTO sessions (user_id, ip_address, computer_name, login_time)
             VALUES (?, ?, ?, ?)
@@ -480,19 +474,6 @@ def login():
 
 @app.route('/logout')
 def logout():
-    user_id = session.get('user_id')
-    if user_id:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute('''
-            UPDATE sessions
-            SET logout_time = ?
-            WHERE user_id = ? AND logout_time IS NULL
-        ''', (datetime.now(), user_id))
-        conn.commit()
-        cursor.close()
-        conn.close()
-    
     session.clear()
     return redirect(url_for('login'))
 
@@ -527,7 +508,7 @@ def generate():
         )
         existing_record = cursor.fetchone()
         
-        if (existing_record):
+        if existing_record:
             return jsonify({
                 'op_number': existing_record[0],
                 'message': 'Record already exists'
@@ -774,14 +755,14 @@ def admin_dashboard():
             'today_ops': today_ops,
             'last_op': last_op
         }
-        
+
         # Get session information
-        cursor.execute('''
+        cursor.execute("""
             SELECT u.username, s.ip_address, s.computer_name, s.login_time
             FROM sessions s
             JOIN users u ON s.user_id = u.id
             ORDER BY s.login_time DESC
-        ''')
+        """)
         sessions = cursor.fetchall()
         
         return render_template('admin.html', users=users, api_users=api_users, stats=stats, sessions=sessions)
