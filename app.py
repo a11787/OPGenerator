@@ -1103,6 +1103,37 @@ def clear_vacation(username):
         cursor.close()
         conn.close()
 
+@app.route('/admin/user/<username>/delete-vacation', methods=['POST'])
+@admin_required
+def delete_vacation(username):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute('SELECT username FROM users WHERE username = ?', (username,))
+        if not cursor.fetchone():
+            return jsonify({'success': False, 'message': 'User not found'}), 404
+
+        cursor.execute('''
+            UPDATE users 
+            SET vacation_start = NULL,
+                vacation_end = NULL
+            WHERE username = ?
+        ''', (username,))
+        
+        conn.commit()
+        return jsonify({
+            'success': True, 
+            'message': f'Vacation period deleted for {username}'
+        })
+        
+    except Exception as e:
+        conn.rollback()
+        logging.error(f"Error deleting vacation period: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
 if __name__ == '__main__':
     init_db()  # This will recreate the table and sequence
     app.run(debug=True)
