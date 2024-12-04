@@ -207,6 +207,9 @@
                                     <button class="btn btn-sm btn-outline-danger" onclick="clearVacation('{{ user.username }}')">
                                         <i class="fas fa-times"></i>
                                     </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteVacation('{{ user.username }}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 {% else %}
                                     <button class="btn btn-sm btn-outline-primary" onclick="showSetVacationModal('{{ user.username }}')">
                                         <i class="fas fa-calendar-plus"></i> Set
@@ -542,6 +545,9 @@
                         <button class="btn btn-sm btn-outline-danger" onclick="clearVacation('${username}')">
                             <i class="fas fa-times"></i>
                         </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteVacation('${username}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     `;
                 }
             } else {
@@ -587,6 +593,42 @@
         .catch(error => {
             console.error('Error:', error);
             showAlert('danger', 'Error clearing vacation period');
+        });
+    }
+
+    function deleteVacation(username) {
+        if (!confirm('Are you sure you want to delete the vacation period for this user?')) {
+            return;
+        }
+        
+        fetch(`/admin/user/${username}/delete-vacation`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('success', data.message);
+                
+                // Update UI dynamically
+                const userRow = document.querySelector(`tr[data-username="${username}"]`);
+                if (userRow) {
+                    const vacationCell = userRow.querySelector('td:nth-child(5)');
+                    vacationCell.innerHTML = `
+                        <button class="btn btn-sm btn-outline-primary" onclick="showSetVacationModal('${username}')">
+                            <i class="fas fa-calendar-plus"></i> Set
+                        </button>
+                    `;
+                }
+            } else {
+                showAlert('danger', data.message || 'Error deleting vacation period');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('danger', 'Error deleting vacation period');
         });
     }
 </script>
