@@ -1,15 +1,21 @@
-from flask import Flask, request, jsonify, render_template, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
+from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
 from datetime import datetime
 import pyodbc
-from dotenv import load_dotenv
-from werkzeug.security import generate_password_hash, check_password_hash
-import secrets
-from functools import wraps
-import os
+import json
+import csv
+from io import StringIO
+from flask_wtf.csrf import CSRFProtect
 import logging
+from logging.handlers import RotatingFileHandler
+import os
+import secrets
+from dotenv import load_dotenv
 from flask_restful import Api, Resource, reqparse
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
+from apispec_webframeworks.flask import FlaskPlugin
 from flask_apispec.extension import FlaskApiSpec
 from flask_apispec.views import MethodResource
 from flask_apispec import marshal_with, doc, use_kwargs
@@ -17,26 +23,118 @@ from marshmallow import Schema, fields
 import io
 import csv
 from flask import Response
-
-# Set up logging
-logging.basicConfig(
-    filename='api.log',
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+import socket
+import re
+from flask_wtf import FlaskForm, CSRFProtect
+from wtforms import StringField, PasswordField
+from wtforms.validators import DataRequired
+import time
+from urllib.parse import urlparse, urljoin
 
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = secrets.token_hex(16)
+app.secret_key = os.getenv('FLASK_SECRET_KEY') or secrets.token_hex(32)
+csrf = CSRFProtect(app)
+
+# Set up logging
+LOG_FORMAT = '%(asctime)s - %(levelname)s - [%(name)s] - %(message)s'
+JSON_LOG_FORMAT = {
+    'timestamp': '%(asctime)s',
+    'level': '%(levelname)s',
+    'logger': '%(name)s',
+    'message': '%(message)s',
+    'path': '%(pathname)s',
+    'line': '%(lineno)d',
+    'function': '%(funcName)s'
+}
+
+class JsonFormatter(logging.Formatter):
+    def format(self, record):
+        log_obj = {}
+        for k, v in JSON_LOG_FORMAT.items():
+            log_obj[k] = self._format_value(record, v)
+        
+        if hasattr(record, 'user'):
+            log_obj['user'] = record.user
+        if hasattr(record, 'ip'):
+            log_obj['ip'] = record.ip
+        if hasattr(record, 'action'):
+            log_obj['action'] = record.action
+        
+        return json.dumps(log_obj)
+    
+    def _format_value(self, record, format_string):
+        return logging.Formatter(format_string).format(record)
+
+# Create logs directory if it doesn't exist
+if not os.path.exists('logs'):
+    os.makedirs('logs')
+
+# Configure app logger
+app_handler = RotatingFileHandler('logs/app.log', maxBytes=10485760, backupCount=10)
+app_handler.setFormatter(JsonFormatter())
+app_logger = logging.getLogger('app')
+app_logger.setLevel(logging.INFO)
+app_logger.addHandler(app_handler)
+
+# Configure security events logger with JSON formatting
+security_handler = RotatingFileHandler('logs/security.log', maxBytes=10485760, backupCount=10)
+security_handler.setFormatter(JsonFormatter())
+security_logger = logging.getLogger('security')
+security_logger.setLevel(logging.INFO)
+security_logger.addHandler(security_handler)
+
+# Configure error logger
+error_handler = RotatingFileHandler('logs/error.log', maxBytes=10485760, backupCount=10)
+error_handler.setFormatter(JsonFormatter())
+error_logger = logging.getLogger('error')
+error_logger.setLevel(logging.ERROR)
+error_logger.addHandler(error_handler)
+
+# Use environment variable for secret key, or generate a secure random one
+app.config['WTF_CSRF_ENABLED'] = True
+app.config['WTF_CSRF_TIME_LIMIT'] = 3600  # 1 hour
+app.config['WTF_CSRF_SSL_STRICT'] = True
+
+@app.after_request
+def add_security_headers(response):
+    """Add security headers to each response"""
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    return response
+
+@app.context_processor
+def utility_processor():
+    def get_user_fullname():
+        if 'user_id' in session:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            try:
+                cursor.execute("SELECT full_name FROM users WHERE username = ?", (session['user_id'],))
+                result = cursor.fetchone()
+                return result[0] if result else ''
+            except Exception as e:
+                app_logger.error(f"Error getting user full name: {str(e)}")
+                return ''
+            finally:
+                cursor.close()
+                conn.close()
+        return ''
+        
+    return {
+        'current_year': datetime.now().year,
+        'user_fullname': get_user_fullname
+    }
 
 # Load API token from environment
 api_token = os.getenv('API_TOKEN')
 if not api_token:
     api_token = 'your-secret-api-token'
-    logging.warning(f"API_TOKEN not found in .env file. Using default token: {api_token}")
+    app_logger.warning(f"API_TOKEN not found in .env file. Using default token: {api_token}")
 else:
-    logging.info(f"Loaded API token from .env: {api_token}")
+    app_logger.info(f"Loaded API token from .env: {api_token}")
 
 app.config['API_TOKEN'] = api_token
 app.config.update({
@@ -93,91 +191,192 @@ class UserResponseSchema(Schema):
 # Database connection
 def get_db_connection():
     server = os.getenv("DB_SERVER", "localhost")
-    database = os.getenv("DB_NAME", "OpGenerator")
+    database = os.getenv("DB_NAME", "master")  # Using master database initially
     conn_str = (
         f"Driver={{ODBC Driver 17 for SQL Server}};"
         f"Server={server};"
         f"Database={database};"
         "Trusted_Connection=yes;"
+        "MARS_Connection=yes;"  # Allow multiple active result sets
     )
-    return pyodbc.connect(conn_str)
+    conn = pyodbc.connect(conn_str, autocommit=False)
+    return conn
 
-# Create table if not exists
+# Create database if not exists
 def init_db():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
+    """Initialize the database with tables and initial data."""
     try:
-        # Drop existing tables to start fresh
-        cursor.execute('''
-            IF OBJECT_ID('records', 'U') IS NOT NULL DROP TABLE records;
-            IF OBJECT_ID('users', 'U') IS NOT NULL DROP TABLE users;
-            IF OBJECT_ID('api_users', 'U') IS NOT NULL DROP TABLE api_users;
-        ''')
-        
-        # Create records table
-        cursor.execute('''
-            CREATE TABLE records (
-                id INT IDENTITY(1,1) PRIMARY KEY,
-                name NVARCHAR(100),
-                id1 NVARCHAR(50),
-                id2 NVARCHAR(50),
-                op_number INT,
-                created_at DATETIME DEFAULT GETDATE()
-            )
-        ''')
-        
-        # Create users table
-        cursor.execute('''
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Create tables if they don't exist
+        cursor.execute("""
+            IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='users' AND xtype='U')
             CREATE TABLE users (
-                id INT IDENTITY(1,1) PRIMARY KEY,
-                username NVARCHAR(50) UNIQUE,
-                password_hash NVARCHAR(200),
-                full_name NVARCHAR(100),
-                is_admin BIT DEFAULT 0,
-                is_approved BIT DEFAULT 0,
-                is_disabled BIT DEFAULT 0,
-                vacation_start DATETIME NULL,
-                vacation_end DATETIME NULL,
-                created_at DATETIME DEFAULT GETDATE()
+                username VARCHAR(50) PRIMARY KEY,
+                password VARCHAR(255) NOT NULL,
+                is_admin BIT NOT NULL DEFAULT 0,
+                full_name VARCHAR(100),
+                is_approved BIT NOT NULL DEFAULT 0,
+                is_disabled BIT NOT NULL DEFAULT 0,
+                vacation_start DATE,
+                vacation_end DATE
             )
-        ''')
+        """)
 
-        # Create api_users table
-        cursor.execute('''
-            CREATE TABLE api_users (
-                id INT IDENTITY(1,1) PRIMARY KEY,
-                username NVARCHAR(50) UNIQUE,
-                password_hash NVARCHAR(200),
-                api_token NVARCHAR(200) UNIQUE,
-                created_at DATETIME DEFAULT GETDATE()
+        cursor.execute("""
+            IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='sessions' AND xtype='U')
+            CREATE TABLE sessions (
+                session_id INT IDENTITY(1,1) PRIMARY KEY,
+                username VARCHAR(50) NOT NULL,
+                ip_address VARCHAR(45),
+                computer_name VARCHAR(100),
+                login_time DATETIME DEFAULT GETDATE(),
+                logout_time DATETIME,
+                FOREIGN KEY (username) REFERENCES users(username)
             )
-        ''')
+        """)
 
-        # Create default admin user (automatically approved)
+        cursor.execute("""
+            IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='records' AND xtype='U')
+            CREATE TABLE records (
+                op_number INT PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                id1 VARCHAR(50) NOT NULL,
+                id2 VARCHAR(50) NOT NULL,
+                created_by VARCHAR(50) NOT NULL,
+                created_at DATETIME DEFAULT GETDATE(),
+                FOREIGN KEY (created_by) REFERENCES users(username)
+            )
+        """)
+
+        cursor.execute("""
+            IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='groups' AND xtype='U')
+            CREATE TABLE groups (
+                group_id INT IDENTITY(1,1) PRIMARY KEY,
+                group_name VARCHAR(50) NOT NULL UNIQUE
+            )
+        """)
+
+        cursor.execute("""
+            IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='permissions' AND xtype='U')
+            CREATE TABLE permissions (
+                permission_id INT IDENTITY(1,1) PRIMARY KEY,
+                permission_name VARCHAR(50) NOT NULL UNIQUE
+            )
+        """)
+
+        cursor.execute("""
+            IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='group_permissions' AND xtype='U')
+            CREATE TABLE group_permissions (
+                group_id INT,
+                permission_id INT,
+                PRIMARY KEY (group_id, permission_id),
+                FOREIGN KEY (group_id) REFERENCES groups(group_id),
+                FOREIGN KEY (permission_id) REFERENCES permissions(permission_id)
+            )
+        """)
+
+        cursor.execute("""
+            IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='user_groups' AND xtype='U')
+            CREATE TABLE user_groups (
+                username VARCHAR(50),
+                group_id INT,
+                PRIMARY KEY (username, group_id),
+                FOREIGN KEY (username) REFERENCES users(username),
+                FOREIGN KEY (group_id) REFERENCES groups(group_id)
+            )
+        """)
+
+        # Create sequence if it doesn't exist
+        cursor.execute("""
+            IF NOT EXISTS (SELECT * FROM sys.sequences WHERE name = 'op_number_seq')
+            CREATE SEQUENCE op_number_seq
+            START WITH 1
+            INCREMENT BY 1
+        """)
+
+        # Insert default permissions if they don't exist
+        cursor.execute("""
+            IF NOT EXISTS (SELECT 1 FROM permissions WHERE permission_name = 'generate_op')
+            INSERT INTO permissions (permission_name) VALUES ('generate_op');
+            
+            IF NOT EXISTS (SELECT 1 FROM permissions WHERE permission_name = 'search_op')
+            INSERT INTO permissions (permission_name) VALUES ('search_op');
+            
+            IF NOT EXISTS (SELECT 1 FROM permissions WHERE permission_name = 'manage_users')
+            INSERT INTO permissions (permission_name) VALUES ('manage_users');
+            
+            IF NOT EXISTS (SELECT 1 FROM permissions WHERE permission_name = 'manage_groups')
+            INSERT INTO permissions (permission_name) VALUES ('manage_groups');
+            
+            IF NOT EXISTS (SELECT 1 FROM permissions WHERE permission_name = 'export_results')
+            INSERT INTO permissions (permission_name) VALUES ('export_results');
+        """)
+
+        # Insert admin group if it doesn't exist
+        cursor.execute("""
+            IF NOT EXISTS (SELECT 1 FROM groups WHERE group_name = 'admin')
+            INSERT INTO groups (group_name) VALUES ('admin')
+        """)
+
+        # Get admin group ID
+        cursor.execute("SELECT group_id FROM groups WHERE group_name = 'admin'")
+        admin_group_id = cursor.fetchone()[0]
+
+        # Get all permission IDs
+        cursor.execute("SELECT permission_id FROM permissions")
+        permission_ids = [row[0] for row in cursor.fetchall()]
+
+        # Assign all permissions to admin group
+        for permission_id in permission_ids:
+            cursor.execute("""
+                IF NOT EXISTS (
+                    SELECT 1 FROM group_permissions 
+                    WHERE group_id = ? AND permission_id = ?
+                )
+                INSERT INTO group_permissions (group_id, permission_id) 
+                VALUES (?, ?)
+            """, admin_group_id, permission_id, admin_group_id, permission_id)
+
+        # Insert admin user if they don't exist
         admin_password = generate_password_hash('admin')
-        cursor.execute('''
-            INSERT INTO users (username, password_hash, full_name, is_admin, is_approved)
-            VALUES (?, ?, ?, 1, 1)
-        ''', ('admin', admin_password, 'Administrator'))
-        
+        cursor.execute("""
+            IF NOT EXISTS (SELECT 1 FROM users WHERE username = 'admin')
+            INSERT INTO users (username, password, is_admin, full_name, is_approved) 
+            VALUES ('admin', ?, 1, 'Administrator', 1)
+        """, admin_password)
+
+        # Assign admin user to admin group
+        cursor.execute("""
+            IF NOT EXISTS (
+                SELECT 1 FROM user_groups 
+                WHERE username = 'admin' AND group_id = ?
+            )
+            INSERT INTO user_groups (username, group_id) 
+            VALUES ('admin', ?)
+        """, admin_group_id, admin_group_id)
+
         conn.commit()
-        logging.info("Database initialized successfully with admin user")
-        
+        app_logger.info("Database initialized successfully with admin user")
+
     except Exception as e:
-        logging.error(f"Error initializing database: {str(e)}")
-        conn.rollback()
-        raise e
+        error_logger.exception("Database initialization error")
+        raise
     finally:
         cursor.close()
         conn.close()
 
 def login_required(f):
+    @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'user_id' not in session:
-            return redirect(url_for('login'))
+            audit_logger.log_action('unauthorized_access', 
+                                  details={'endpoint': request.endpoint},
+                                  status='failed')
+            flash('Please log in to access this page', 'warning')
+            return redirect(url_for('login', next=request.url))
         return f(*args, **kwargs)
-    decorated_function.__name__ = f.__name__
     return decorated_function
 
 # Admin required decorator
@@ -189,7 +388,7 @@ def admin_required(f):
         
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT is_admin FROM users WHERE id = ?", (session['user_id'],))
+        cursor.execute("SELECT is_admin FROM users WHERE username = ?", (session['user_id'],))
         user = cursor.fetchone()
         conn.close()
 
@@ -203,10 +402,10 @@ def require_api_token(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = request.headers.get('X-API-Token')
-        logging.info(f"Received token: {token}")
+        app_logger.info(f"Received token: {token}")
         
         if not token:
-            logging.warning("No token provided")
+            app_logger.warning("No token provided")
             return {'error': 'API token required'}, 401
             
         conn = get_db_connection()
@@ -217,7 +416,7 @@ def require_api_token(f):
         conn.close()
         
         if not user:
-            logging.warning("Invalid token provided")
+            app_logger.warning("Invalid token provided")
             return {'error': 'Invalid API token'}, 401
             
         return f(*args, **kwargs)
@@ -327,7 +526,7 @@ class TokenResource(MethodResource):
         # Verify credentials
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute('SELECT id, password_hash FROM api_users WHERE username = ?', (username,))
+        cursor.execute('SELECT id, password FROM api_users WHERE username = ?', (username,))
         user = cursor.fetchone()
         
         if not user or not check_password_hash(user[1], password):
@@ -372,9 +571,9 @@ class UserResource(MethodResource):
         # Create new API user
         password_hash = generate_password_hash(password)
         cursor.execute('''
-            INSERT INTO api_users (username, password_hash)
-            VALUES (?, ?)
-        ''', (username, password_hash))
+            INSERT INTO api_users (username, password, full_name)
+            VALUES (?, ?, ?)
+        ''', (username, password_hash, full_name))
         conn.commit()
         cursor.close()
         conn.close()
@@ -394,136 +593,496 @@ docs.register(TokenResource)
 docs.register(UserResource)
 
 def get_computer_name():
-    return request.headers.get('X-Computer-Name', 'Unknown')
+    ip_address = request.remote_addr
+    try:
+        return socket.gethostbyaddr(ip_address)[0]  # Resolves the hostname
+    except socket.herror:
+        return "Unknown"
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'GET':
-        return render_template('login.html')
-    
-    # Handle both JSON and form data
-    if request.is_json:
-        data = request.get_json()
-        username = data.get('username')
-        password = data.get('password')
-    else:
-        username = request.form.get('username')
-        password = request.form.get('password')
-    
-    if not username or not password:
-        return jsonify({'error': 'Username and password are required'}), 400
-    
+def get_user_permissions(username):
+    """Get all permissions for a user based on their group memberships"""
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    try:
-        cursor.execute('SELECT id, password_hash, is_admin, full_name, is_approved, is_disabled, vacation_start, vacation_end FROM users WHERE username = ?', (username,))
-        user = cursor.fetchone()
-        
-        if not user:
-            return jsonify({'error': 'Invalid username or password'}), 401
-            
-        if not check_password_hash(user[1], password):
-            return jsonify({'error': 'Invalid username or password'}), 401
-            
-        if not user[4] and not user[2]:  # not approved and not admin
-            return jsonify({'error': 'Your account is pending approval. Please contact the administrator.'}), 403
-            
-        if user[5]:  # is_disabled
-            return jsonify({'error': 'Your account is disabled. Please contact the administrator.'}), 403
-            
-        # Check if user is on vacation
-        current_time = datetime.now()
-        if user[6] and user[7] and user[6] <= current_time <= user[7]:
-            return jsonify({'error': f'Your account is on vacation until {user[7].strftime("%Y-%m-%d")}. Please contact the administrator.'}), 403
-        
-        session['user_id'] = user[0]
-        session['is_admin'] = bool(user[2])
-        session['username'] = username
-        session['full_name'] = user[3]
-        
-        ip_address = request.remote_addr
-        computer_name = get_computer_name()
-        logging.info(f"User {username} logged in from IP {ip_address} and computer {computer_name}")
-        
-        if request.is_json:
-            return jsonify({'success': True, 'message': 'Login successful', 'is_admin': bool(user[2]), 'full_name': user[3]})
-        else:
-            return redirect(url_for('admin_dashboard' if bool(user[2]) else 'index'))
+    cursor.execute('''
+        SELECT DISTINCT p.permission_name
+        FROM permissions p
+        JOIN group_permissions gp ON p.permission_id = gp.permission_id
+        JOIN groups g ON gp.group_id = g.group_id
+        JOIN user_groups ug ON g.group_id = ug.group_id
+        WHERE ug.username = ?
+    ''', (username,))
     
-    except Exception as e:
-        logging.error(f"Login error: {str(e)}")
-        return jsonify({'error': 'Database error occurred'}), 500
-    finally:
-        cursor.close()
-        conn.close()
+    permissions = [row[0] for row in cursor.fetchall()]
+    
+    cursor.close()
+    conn.close()
+    
+    return permissions
 
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('login'))
+def get_user_groups(username):
+    """Get all groups a user belongs to"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        SELECT g.group_name
+        FROM groups g
+        JOIN user_groups ug ON g.group_id = ug.group_id
+        WHERE ug.username = ?
+    ''', (username,))
+    
+    groups = [row[0] for row in cursor.fetchall()]
+    
+    cursor.close()
+    conn.close()
+    
+    return groups
+
+def has_permission(permission_name):
+    """Decorator to check if user has the required permission"""
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if 'user_id' not in session:
+                audit_logger.log_action('permission_check',
+                                      details={'permission': permission_name,
+                                              'endpoint': request.endpoint,
+                                              'error': 'No user session'},
+                                      status='failed')
+                return redirect(url_for('login'))
+                
+            # Admin users have all permissions
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("SELECT is_admin FROM users WHERE username = ?", (session['user_id'],))
+            user = cursor.fetchone()
+            cursor.close()
+            conn.close()
+            
+            if user and user[0]:  # is_admin
+                audit_logger.log_action('permission_check',
+                                      details={'permission': permission_name,
+                                              'endpoint': request.endpoint,
+                                              'granted_by': 'admin_status'},
+                                      status='success')
+                return f(*args, **kwargs)
+            
+            # Check specific permission
+            user_permissions = get_user_permissions(session['user_id'])
+            if permission_name not in user_permissions:
+                audit_logger.log_action('permission_check',
+                                      details={'permission': permission_name,
+                                              'endpoint': request.endpoint,
+                                              'user_permissions': list(user_permissions),
+                                              'error': 'Permission not granted'},
+                                      status='failed')
+                return jsonify({
+                    'success': False,
+                    'message': 'You do not have permission to perform this action'
+                }), 403
+            
+            audit_logger.log_action('permission_check',
+                                  details={'permission': permission_name,
+                                          'endpoint': request.endpoint,
+                                          'granted_by': 'explicit_permission'},
+                                  status='success')
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+class AuditLogger:
+    def __init__(self):
+        self.logger = logging.getLogger('audit')
+        if not self.logger.handlers:  # Only add handler if none exists
+            self.logger.setLevel(logging.INFO)
+            audit_handler = RotatingFileHandler('logs/audit.log', maxBytes=10485760, backupCount=10)
+            audit_handler.setFormatter(JsonFormatter())
+            self.logger.addHandler(audit_handler)
+    
+    def log_action(self, action, user=None, details=None, status='success'):
+        # First try to get user from parameter
+        current_user = user
+        
+        # If no user provided, try to get from session
+        if not current_user:
+            current_user = session.get('user_id')  # Changed from username to user_id
+            
+        # If still no user and we're in a request context, this is unexpected
+        if not current_user and request:
+            error_logger.warning(f"Audit log called without user for action: {action}")
+            if session:
+                error_logger.warning(f"Session contents: {session}")
+        
+        extra = {
+            'user': current_user or 'anonymous',
+            'ip': request.remote_addr,
+            'action': action,
+            'details': details,
+            'status': status,
+            'user_agent': request.user_agent.string
+        }
+        
+        record = logging.LogRecord(
+            name='audit',
+            level=logging.INFO,
+            pathname=__file__,
+            lineno=0,
+            msg=f"User action: {action}",
+            args=(),
+            exc_info=None
+        )
+        
+        for key, value in extra.items():
+            setattr(record, key, value)
+        
+        self.logger.handle(record)
+
+# Initialize audit logger
+audit_logger = AuditLogger()
+
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
+
+def is_safe_url(target):
+    ref_url = urlparse(request.host_url)
+    test_url = urlparse(urljoin(request.host_url, target))
+    return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
 
 @app.route('/')
+def root():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    return redirect(url_for('index'))
+
+@app.route('/index')
 @login_required
 def index():
     return render_template('index.html')
 
-@app.route('/generate', methods=['POST'])
-@login_required
-def generate():
-    data = request.json
-    name = data.get('name')
-    id1 = data.get('id1')
-    id2 = data.get('id2')
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    # Get next URL from either URL parameters or form data
+    next_url = request.args.get('next') or request.form.get('next')
+    # Validate next URL
+    if next_url and not is_safe_url(next_url):
+        next_url = None
     
-    if not all([name, id1, id2]):
-        return jsonify({'error': 'All fields are required'}), 400
+    if request.method == 'GET':
+        return render_template('login.html', form=form)
+        
+    if form.validate_on_submit():
+        try:
+            username = form.username.data
+            password = form.password.data
+            
+            # Log login attempt
+            audit_logger.log_action('login_attempt', username)
+            
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                SELECT username, password, is_admin, full_name, is_approved, is_disabled, 
+                       vacation_start, vacation_end 
+                FROM users 
+                WHERE username = ?
+            """, username)
+            
+            user = cursor.fetchone()
+            
+            if not user or not check_password_hash(user[1], password):
+                audit_logger.log_action('login_failed', username, details='Invalid credentials', status='failed')
+                flash('Invalid username or password', 'danger')
+                return redirect(url_for('login', next=next_url))
+                
+            if not user[4]:
+                audit_logger.log_action('login_failed', username, details='Account not approved', status='failed')
+                flash('Your account has not been approved yet', 'warning')
+                return redirect(url_for('login', next=next_url))
+                
+            if user[5]:
+                audit_logger.log_action('login_failed', username, details='Account disabled', status='failed')
+                flash('Your account has been disabled. Please contact an administrator', 'danger')
+                return redirect(url_for('login', next=next_url))
+                
+            # Check vacation period
+            if user[6] and user[7]:
+                current_date = datetime.now().date()
+                if user[6] <= current_date <= user[7]:
+                    audit_logger.log_action('login_failed', username, details='Vacation period', status='failed')
+                    flash('You cannot log in during your vacation period', 'warning')
+                    return redirect(url_for('login', next=next_url))
+                    
+            # Create session record
+            computer_name = get_computer_name()
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO sessions (username, ip_address, computer_name, login_time)
+                OUTPUT INSERTED.session_id
+                VALUES (?, ?, ?, ?)
+            """, (username, request.remote_addr, computer_name, datetime.now()))
+            
+            session_id = cursor.fetchone()[0]
+            
+            # Get user permissions
+            cursor.execute("""
+                SELECT p.permission_name
+                FROM user_groups ug
+                JOIN group_permissions gp ON ug.group_id = gp.group_id
+                JOIN permissions p ON gp.permission_id = p.permission_id
+                WHERE ug.username = ?
+            """, username)
+            
+            user_permissions = [row[0] for row in cursor.fetchall()]
+            
+            # Update session
+            session['user_id'] = username
+            session['is_admin'] = user[2]
+            session['full_name'] = user[3]
+            session['session_id'] = session_id
+            session['permissions'] = user_permissions
+            
+            audit_logger.log_action('login', username)
+            audit_logger.log_action('session_create', username, details={'session_id': session_id})
+            
+            conn.commit()
+            
+            # Redirect to next URL if provided and valid, otherwise to default page
+            if next_url:
+                audit_logger.log_action('redirect_after_login', username, 
+                                      details={'redirect_url': next_url})
+                return redirect(next_url)
+            
+            if user[2]:
+                return redirect(url_for('admin_dashboard'))
+            return redirect(url_for('index'))
+            
+        except Exception as e:
+            error_logger.exception(f"Login error", extra={'user': username if username else 'unknown'})
+            flash('An error occurred during login. Please try again.', 'danger')
+            return redirect(url_for('login', next=next_url))
+        finally:
+            cursor.close()
+            conn.close()
     
-    # Validate ID1 and ID2 are numbers only
-    if not id1.isdigit() or not id2.isdigit():
-        return jsonify({'error': 'ID1 and ID2 must contain numbers only'}), 400
-    
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    try:
-        # Check if the same data exists
-        cursor.execute(
-            'SELECT op_number FROM records WHERE name = ? AND id1 = ? AND id2 = ?',
-            (name, id1, id2)
-        )
-        existing_record = cursor.fetchone()
-        
-        if (existing_record):
-            return jsonify({
-                'op_number': existing_record[0],
-                'message': 'Record already exists'
-            })
-        
-        # Get next OP number
-        cursor.execute("SELECT NEXT VALUE FOR OpNumberSequence")
-        op_number = cursor.fetchone()[0]
-        
-        # Insert new record
-        cursor.execute(
-            'INSERT INTO records (name, id1, id2, op_number) VALUES (?, ?, ?, ?)',
-            (name, id1, id2, op_number)
-        )
-        conn.commit()
-        
-        return jsonify({
-            'op_number': op_number,
-            'message': 'New record created'
-        })
-    except pyodbc.Error as e:
-        logging.error(f"Database error during generation: {str(e)}")
-        conn.rollback()
-        return jsonify({'error': 'Database error occurred'}), 500
-    finally:
-        cursor.close()
-        conn.close()
+    return render_template('login.html', form=form)
 
-@app.route('/search', methods=['GET'])
+@app.route('/logout')
+@login_required
+def logout():
+    try:
+        username = session.get('user_id')
+        session_id = session.get('session_id')
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        try:
+            # Update session end time
+            cursor.execute("""
+                UPDATE sessions 
+                SET logout_time = ? 
+                WHERE session_id = ?
+            """, (datetime.now(), session_id))
+            
+            conn.commit()
+            
+            audit_logger.log_action('logout', username)
+            audit_logger.log_action('session_end', username, details={'session_id': session_id})
+            
+        except Exception as e:
+            error_logger.exception(f"Logout error", extra={'user': username})
+        finally:
+            cursor.close()
+            conn.close()
+            
+        # Clear session
+        session.clear()
+        flash('You have been logged out', 'info')
+        
+    except Exception as e:
+        error_logger.exception("Error during logout")
+        
+    return redirect(url_for('login'))
+
+@app.route('/generate', methods=['GET', 'POST'])
+@login_required
+@has_permission('generate_op')
+def generate():
+    try:
+        # Log attempt
+        audit_logger.log_action('generate_op_attempt', 
+                              details={'method': request.method})
+        
+        if not request.is_json:
+            audit_logger.log_action('generate_op', 
+                                  details={'error': 'Invalid content type'},
+                                  status='failed')
+            return jsonify({'error': 'Request must be JSON'}), 400
+            
+        try:
+            data = request.get_json()
+        except Exception as e:
+            audit_logger.log_action('generate_op',
+                                  details={'error': 'JSON parse error', 'message': str(e)},
+                                  status='failed')
+            return jsonify({'error': 'Invalid JSON format'}), 400
+            
+        if not data:
+            audit_logger.log_action('generate_op',
+                                  details={'error': 'Empty data'},
+                                  status='failed')
+            return jsonify({'error': 'No data provided'}), 400
+            
+        name = data.get('name')
+        id1 = data.get('id1')
+        id2 = data.get('id2')
+        
+        # Input validation
+        if not all([name, id1, id2]):
+            missing_fields = [f for f, v in {'name': name, 'id1': id1, 'id2': id2}.items() if not v]
+            audit_logger.log_action('generate_op',
+                                  details={'error': 'Missing required fields',
+                                          'missing_fields': missing_fields},
+                                  status='failed')
+            return jsonify({'error': 'All fields (name, id1, id2) are required'}), 400
+        
+        # Validate ID1 and ID2 are numbers only
+        if not id1.isdigit() or not id2.isdigit():
+            audit_logger.log_action('generate_op',
+                                  details={'error': 'Invalid ID format',
+                                          'id1': id1,
+                                          'id2': id2},
+                                  status='failed')
+            return jsonify({'error': 'ID1 and ID2 must contain numbers only'}), 400
+            
+        # Validate input lengths
+        if len(name) > 100 or len(id1) > 20 or len(id2) > 20:
+            audit_logger.log_action('generate_op',
+                                  details={'error': 'Field length exceeded',
+                                          'lengths': {
+                                              'name': len(name),
+                                              'id1': len(id1),
+                                              'id2': len(id2)
+                                          }},
+                                  status='failed')
+            return jsonify({'error': 'Input fields exceed maximum length'}), 400
+        
+        conn = None
+        cursor = None
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            
+            # Check if the same data exists
+            cursor.execute(
+                'SELECT op_number FROM records WHERE name = ? AND id1 = ? AND id2 = ?',
+                (name, id1, id2)
+            )
+            existing_record = cursor.fetchone()
+            
+            if existing_record:
+                audit_logger.log_action('generate_op',
+                                      details={'status': 'duplicate',
+                                              'op_number': existing_record[0]})
+                return jsonify({
+                    'op_number': existing_record[0],
+                    'message': 'Record already exists'
+                })
+            
+            # Get next OP number with retry logic
+            max_retries = 3
+            op_number = None
+            last_error = None
+            
+            for attempt in range(max_retries):
+                try:
+                    cursor.execute("SELECT NEXT VALUE FOR OpNumberSequence")
+                    op_number = cursor.fetchone()[0]
+                    break
+                except pyodbc.Error as e:
+                    last_error = str(e)
+                    app_logger.warning(f"Retry {attempt + 1} for sequence generation: {last_error}")
+                    audit_logger.log_action('generate_op_sequence_retry',
+                                          details={'attempt': attempt + 1,
+                                                  'error': last_error})
+                    if attempt < max_retries - 1:
+                        time.sleep(0.5)  # Short delay before retry
+            
+            if op_number is None:
+                error_msg = f"Failed to generate sequence after {max_retries} attempts. Last error: {last_error}"
+                audit_logger.log_action('generate_op',
+                                      details={'error': error_msg},
+                                      status='failed')
+                raise Exception(error_msg)
+            
+            # Insert new record
+            cursor.execute(
+                'INSERT INTO records (name, id1, id2, op_number, created_by) VALUES (?, ?, ?, ?, ?)',
+                (name, id1, id2, op_number, session.get('user_id'))
+            )
+            conn.commit()
+            
+            audit_logger.log_action('generate_op',
+                                  details={'op_number': op_number,
+                                          'name': name,
+                                          'created_by': session.get('user_id')})
+            return jsonify({
+                'op_number': op_number,
+                'message': 'New record created'
+            })
+            
+        except pyodbc.Error as e:
+            error_msg = str(e)
+            app_logger.error(f"Database error during generation: {error_msg}")
+            audit_logger.log_action('generate_op',
+                                  details={'error': 'Database error',
+                                          'message': error_msg},
+                                  status='failed')
+            if conn:
+                try:
+                    conn.rollback()
+                except:
+                    pass  # Ignore rollback errors
+            return jsonify({'error': f'Database error occurred: {error_msg}. Please try again.'}), 500
+            
+        except Exception as e:
+            error_msg = str(e)
+            audit_logger.log_action('generate_op',
+                                  details={'error': 'Unexpected error',
+                                          'message': error_msg},
+                                  status='failed')
+            app_logger.error(f"Unexpected error in generate route: {error_msg}")
+            return jsonify({'error': f'An unexpected error occurred: {error_msg}. Please try again.'}), 500
+            
+        finally:
+            if cursor:
+                try:
+                    cursor.close()
+                except:
+                    pass  # Ignore cursor close errors
+            if conn:
+                try:
+                    conn.close()
+                except:
+                    pass  # Ignore connection close errors
+                
+    except Exception as e:
+        error_msg = str(e)
+        audit_logger.log_action('generate_op',
+                              details={'error': 'Unhandled error',
+                                      'message': error_msg},
+                              status='failed')
+        app_logger.error(f"Unhandled error in generate route: {error_msg}")
+        return jsonify({'error': f'An unexpected error occurred. Please try again.'}), 500
+
+@app.route('/search', methods=['GET', 'POST'])
+@login_required
+@has_permission('search_op')
 def search_ops():
     try:
         # Get search parameters
@@ -625,7 +1184,7 @@ def search_ops():
         })
         
     except Exception as e:
-        logging.error(f"Search error: {str(e)}")
+        app_logger.error(f"Search error: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'An error occurred while searching'
@@ -633,7 +1192,7 @@ def search_ops():
     finally:
         cursor.close()
         conn.close()
-
+        
 @app.route('/api/statuses', methods=['GET'])
 def get_statuses():
     """Get all possible OP statuses for filtering"""
@@ -652,85 +1211,172 @@ def signup():
     if request.method == 'GET':
         return render_template('signup.html')
     
-    data = request.get_json()
-    username = data.get('username')
-    password = data.get('password')
-    full_name = data.get('full_name')
+    # Get form data
+    username = request.form.get('username')
+    password = request.form.get('password')
+    confirm_password = request.form.get('confirm_password')
+    full_name = request.form.get('full_name')
+    email = request.form.get('email')
     
-    if not username or not password or not full_name:
-        return jsonify({'error': 'All fields are required'}), 400
+    # Validate required fields
+    if not all([username, password, confirm_password, full_name, email]):
+        flash('All fields are required', 'danger')
+        return redirect(url_for('signup'))
     
-    if len(password) < 8:
-        return jsonify({'error': 'Password must be at least 8 characters long'}), 400
+    # Validate username format
+    if not re.match(r'^[a-zA-Z0-9_-]{3,50}$', username):
+        flash('Username must be 3-50 characters long and can only contain letters, numbers, underscores, and hyphens', 'danger')
+        return redirect(url_for('signup'))
+    
+    # Validate email format
+    if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
+        flash('Please enter a valid email address', 'danger')
+        return redirect(url_for('signup'))
+    
+    # Validate password strength
+    if not re.match(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$', password):
+        flash('Password must be at least 8 characters long and include uppercase, lowercase, number, and special character', 'danger')
+        return redirect(url_for('signup'))
+    
+    # Validate password confirmation
+    if password != confirm_password:
+        flash('Passwords do not match', 'danger')
+        return redirect(url_for('signup'))
+    
+    # Validate full name length
+    if not (2 <= len(full_name) <= 100):
+        flash('Full name must be between 2 and 100 characters', 'danger')
+        return redirect(url_for('signup'))
     
     conn = get_db_connection()
     cursor = conn.cursor()
     
     try:
         # Check if username already exists
-        cursor.execute('SELECT id FROM users WHERE username = ?', (username,))
+        cursor.execute('SELECT username FROM users WHERE username = ?', (username,))
         if cursor.fetchone():
-            cursor.close()
-            conn.close()
-            return jsonify({'error': 'Username already exists'}), 400
+            flash('Username already exists', 'danger')
+            return redirect(url_for('signup'))
+            
+        # Check if email already exists
+        cursor.execute('SELECT username FROM users WHERE email = ?', (email,))
+        if cursor.fetchone():
+            flash('Email address already registered', 'danger')
+            return redirect(url_for('signup'))
             
         # Create new user with is_approved = 0
         password_hash = generate_password_hash(password)
         cursor.execute('''
-            INSERT INTO users (username, password_hash, full_name)
-            VALUES (?, ?, ?)
-        ''', (username, password_hash, full_name))
+            INSERT INTO users (username, password, full_name, email, is_admin, is_approved, is_disabled, created_at)
+            VALUES (?, ?, ?, ?, 0, 0, 0, GETDATE())
+        ''', (username, password_hash, full_name, email))
+        
+        # Add user to Standard Users group
+        cursor.execute('''
+            INSERT INTO user_groups (username, group_id)
+            SELECT ?, group_id FROM groups WHERE group_name = 'Standard Users'
+        ''', (username,))
         
         conn.commit()
-        return jsonify({
-            'success': True, 
-            'message': 'Account created successfully. Please wait for administrator approval before logging in.'
-        })
+        flash('Your account has been created successfully! Please wait for an administrator to approve your account before you can log in.', 'success')
+        return redirect(url_for('login'))
     
-    except pyodbc.Error as e:
-        logging.error(f"Database error during signup: {str(e)}")
+    except Exception as e:
+        app_logger.error(f"Database error during signup: {str(e)}")
         conn.rollback()
-        return jsonify({'error': 'Database error occurred'}), 500
+        flash('An error occurred while creating your account', 'danger')
+        return redirect(url_for('signup'))
     finally:
         cursor.close()
         conn.close()
 
 @app.route('/admin')
-@admin_required
+@login_required
+@has_permission('manage_users')
 def admin_dashboard():
     conn = get_db_connection()
     cursor = conn.cursor()
     
     try:
-        # Get regular users (excluding current admin)
+        # Fetch all users with their active session information
         cursor.execute("""
-            SELECT username, full_name, is_approved, is_admin, is_disabled 
-            FROM users 
-            WHERE username != ? 
-            ORDER BY created_at DESC
-        """, (session['username'],))
-        users = [{
-            'username': row[0], 
-            'full_name': row[1], 
-            'is_approved': bool(row[2]),
-            'is_admin': bool(row[3]),
-            'is_disabled': bool(row[4])
-        } for row in cursor.fetchall()]
+            SELECT 
+                u.username, 
+                u.full_name, 
+                u.is_admin,
+                u.is_approved,
+                u.is_disabled,
+                u.vacation_start,
+                u.vacation_end,
+                s.ip_address,
+                s.computer_name,
+                s.login_time
+            FROM users u
+            LEFT JOIN sessions s ON u.username = s.username
+            WHERE u.username != ? And logout_time Is Null
+            ORDER BY u.username, s.login_time DESC
+        """, (session['user_id'],))
         
-        # Get API users from api_users table
+        users_data = cursor.fetchall()
+        users = []
+        current_user = None
+        
+        # Process users and their sessions
+        for row in users_data:
+            username = row[0]
+            
+            # If this is a new user
+            if not current_user or current_user['username'] != username:
+                if current_user:
+                    users.append(current_user)
+                
+                current_user = {
+                    'username': username,
+                    'full_name': row[1],
+                    'is_admin': row[2],
+                    'is_approved': row[3],
+                    'is_disabled': row[4],
+                    'vacation_start': row[5],
+                    'vacation_end': row[6],
+                    'sessions': [],
+                    'groups': []
+                }
+                
+                # Get user groups
+                cursor.execute("""
+                    SELECT group_id 
+                    FROM user_groups 
+                    WHERE username = ?
+                """, (username,))
+                current_user['groups'] = [row[0] for row in cursor.fetchall()]
+            
+            # Add session info if it exists
+            if row[7] or row[8] or row[9]:  # if any session data exists
+                current_user['sessions'].append({
+                    'ip_address': row[7],
+                    'computer_name': row[8],
+                    'login_time': row[9]
+                })
+        
+        # Add the last user
+        if current_user:
+            users.append(current_user)
+        
+        # Get all available groups
         cursor.execute("""
-            SELECT username, api_token 
-            FROM api_users 
-            ORDER BY created_at DESC
+            SELECT group_id, group_name, description 
+            FROM groups
+            ORDER BY group_name
         """)
-        api_users = [{'username': row[0], 'token': row[1]} for row in cursor.fetchall()]
+        all_groups = [{'group_id': row[0], 'group_name': row[1], 'description': row[2]} 
+                     for row in cursor.fetchall()]
         
         # Get statistics
         cursor.execute("SELECT COUNT(*) FROM records")
-        total_ops = cursor.fetchone()[0] or 0
+        total_ops = cursor.fetchone()[0]
         
         cursor.execute("SELECT COUNT(*) FROM records WHERE CAST(created_at AS DATE) = CAST(GETDATE() AS DATE)")
-        today_ops = cursor.fetchone()[0] or 0
+        today_ops = cursor.fetchone()[0]
         
         cursor.execute("SELECT TOP 1 op_number FROM records ORDER BY op_number DESC")
         last_op_row = cursor.fetchone()
@@ -742,43 +1388,206 @@ def admin_dashboard():
             'last_op': last_op
         }
         
-        return render_template('admin.html', users=users, api_users=api_users, stats=stats)
+        return render_template(
+            'admin.html', 
+            users=users,
+            all_groups=all_groups,
+            stats=stats
+        )
     finally:
         cursor.close()
         conn.close()
 
 @app.route('/admin/user/<username>/approve', methods=['POST'])
-@admin_required
+@login_required
+@has_permission('manage_users')
 def approve_user(username):
+    if not request.is_json:
+        return jsonify({'error': 'Invalid request format'}), 400
+
+    # Validate CSRF token
+    token = request.json.get('csrf_token')
+    if not token:
+        return jsonify({'error': 'CSRF token is missing'}), 400
+
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = None
+    try:
+        cursor = conn.cursor()
+        
+        # Get user details first
+        cursor.execute("SELECT username, is_approved FROM users WHERE username = ?", (username,))
+        user = cursor.fetchone()
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+            
+        if user[1]:
+            return jsonify({'error': 'User is already approved'}), 400
+            
+        # Update user approval status
+        cursor.execute("UPDATE users SET is_approved = 1 WHERE username = ?", (username,))
+        conn.commit()
+        
+        audit_logger.log_action('approve_user', details={'target_user': username})
+        return jsonify({'success': True, 'message': f'User {username} has been approved successfully'})
+        
+    except Exception as e:
+        if cursor and conn:
+            conn.rollback()
+        app_logger.error(f"Error approving user {username}: {str(e)}")
+        return jsonify({'error': 'An error occurred while approving the user'}), 500
+        
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+@app.route('/admin/user/<username>/delete', methods=['POST'])
+@login_required
+@has_permission('manage_users')
+def delete_user(username):
+    if not request.is_json:
+        return jsonify({'error': 'Invalid request format'}), 400
+
+    # Validate CSRF token
+    token = request.json.get('csrf_token')
+    if not token:
+        return jsonify({'error': 'CSRF token is missing'}), 400
+
+    if username == session['user_id']:
+        return jsonify({'error': 'Cannot delete your own account'}), 400
+
+    conn = get_db_connection()
+    cursor = None
     
     try:
-        cursor.execute("UPDATE users SET is_approved = 1 WHERE username = ? AND is_admin = 0", (username,))
-        conn.commit()
-        return jsonify({'success': True})
-    except Exception as e:
-        conn.rollback()
-        logging.error(f"Error approving user: {str(e)}")
-        return jsonify({'error': 'Database error occurred'}), 500
-    finally:
-        cursor.close()
-        conn.close()
+        cursor = conn.cursor()
+        
+        app_logger.info(f"Starting delete_user process for username: {username}")
+        
+        # First check if user exists and get current admin status
+        check_user_sql = "SELECT is_admin, is_approved FROM users WHERE username = ?"
+        cursor.execute(check_user_sql, (username,))
+        user = cursor.fetchone()
+        app_logger.info(f"User query result for {username}: {user}")
+        
+        if not user:
+            app_logger.warning(f"Attempt to delete non-existent user: {username}")
+            return jsonify({'error': 'User not found'}), 404
+            
+        if user[0]:  # is_admin
+            app_logger.warning(f"Attempt to delete admin user: {username}")
+            return jsonify({'error': 'Cannot delete admin users'}), 403
 
-@app.route('/admin/user/<username>', methods=['DELETE'])
-@admin_required
-def delete_user(username):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    cursor.execute("DELETE FROM users WHERE username = ? AND is_admin = 0", (username,))
-    conn.commit()
-    conn.close()
-    
-    return jsonify({'success': True})
+        # Check if user is approved
+        is_approved = user[1] if user[1] is not None else 0
+        app_logger.info(f"User {username} approval status: {is_approved}")
+        
+        if is_approved == 1:
+            app_logger.warning(f"Attempt to delete approved user: {username}")
+            return jsonify({'error': 'Cannot delete approved users. Please contact your system administrator.'}), 403
+
+        # Check if user has generated any records
+        check_records_sql = "SELECT COUNT(*) FROM records WHERE name = ?"
+        cursor.execute(check_records_sql, (username,))
+        record_count = cursor.fetchone()[0]
+        app_logger.info(f"Record count for user {username}: {record_count}")
+        
+        if record_count > 0:
+            app_logger.warning(f"Cannot delete user {username} because they have {record_count} records")
+            return jsonify({
+                'error': f'Cannot delete this user because they have generated {record_count} records. ' +
+                        'Please contact your system administrator if you need to remove this user.'
+            }), 403
+
+        # Start transaction
+        app_logger.info(f"Starting deletion transaction for user: {username}")
+
+        try:
+            # Delete from user_groups first
+            delete_groups_sql = """
+                IF EXISTS (SELECT 1 FROM user_groups WHERE username = ?)
+                BEGIN
+                    DELETE FROM user_groups WHERE username = ?
+                END
+            """
+            cursor.execute(delete_groups_sql, (username, username))
+            groups_deleted = cursor.rowcount
+            app_logger.info(f"Deleted {groups_deleted} group associations for user: {username}")
+
+            # Delete from sessions
+            delete_sessions_sql = """
+                IF EXISTS (SELECT 1 FROM sessions WHERE username = ?)
+                BEGIN
+                    DELETE FROM sessions WHERE username = ?
+                END
+            """
+            cursor.execute(delete_sessions_sql, (username, username))
+            sessions_deleted = cursor.rowcount
+            app_logger.info(f"Deleted {sessions_deleted} sessions for user: {username}")
+            
+            # Delete the user
+            delete_user_sql = """
+                IF EXISTS (SELECT 1 FROM users WHERE username = ?)
+                BEGIN
+                    DELETE FROM users WHERE username = ?
+                END
+            """
+            cursor.execute(delete_user_sql, (username, username))
+            users_deleted = cursor.rowcount
+            app_logger.info(f"Deleted user {username}: {users_deleted} rows affected")
+            
+            if users_deleted == 0:
+                raise Exception(f"Failed to delete user {username} from users table")
+
+            # Verify user deletion
+            check_user_sql = "SELECT COUNT(*) FROM users WHERE username = ?"
+            cursor.execute(check_user_sql, (username,))
+            remaining_user = cursor.fetchone()[0]
+            app_logger.info(f"Remaining user count after deletion: {remaining_user}")
+            
+            if remaining_user > 0:
+                raise Exception(f"User {username} still exists after deletion")
+
+            # Commit the transaction
+            conn.commit()
+            app_logger.info(f"Successfully committed deletion of user {username}")
+            
+            audit_logger.log_action('delete_user', details={'target_user': username})
+            return jsonify({
+                'success': True,
+                'message': 'User deleted successfully',
+                'details': {
+                    'sessions_deleted': sessions_deleted,
+                    'groups_deleted': groups_deleted,
+                    'users_deleted': users_deleted
+                }
+            })
+            
+        except Exception as e:
+            app_logger.error(f"Error during deletion transaction: {str(e)}")
+            conn.rollback()
+            return jsonify({'error': str(e)}), 500
+            
+    except Exception as e:
+        app_logger.error(f"Error in delete_user for {username}: {str(e)}")
+        if cursor:
+            try:
+                conn.rollback()
+            except Exception as rollback_error:
+                app_logger.error(f"Error during rollback: {str(rollback_error)}")
+        return jsonify({'error': 'An error occurred while deleting the user'}), 500
+        
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 @app.route('/admin/api-user/<username>', methods=['DELETE'])
-@admin_required
+@login_required
+@has_permission('manage_users')
 def delete_api_user(username):
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -790,7 +1599,8 @@ def delete_api_user(username):
     return jsonify({'success': True})
 
 @app.route('/admin/api-user/<username>/token', methods=['POST'])
-@admin_required
+@login_required
+@has_permission('manage_users')
 def regenerate_token(username):
     new_token = secrets.token_hex(32)
     
@@ -804,14 +1614,15 @@ def regenerate_token(username):
     return jsonify({'success': True})
 
 @app.route('/admin/api-user', methods=['POST'])
-@admin_required
+@login_required
+@has_permission('manage_users')
 def create_api_user():
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
     
     if not username or not password:
-        return jsonify({'success': False, 'error': 'Missing username or password'})
+        return jsonify({'success': False, 'error': 'Missing username or password'}), 400
     
     hashed_password = generate_password_hash(password)
     api_token = secrets.token_hex(32)
@@ -820,22 +1631,35 @@ def create_api_user():
     cursor = conn.cursor()
     
     try:
+        # Print the SQL query and parameters for debugging
+        print(f"Executing SQL: INSERT INTO api_users (username, password, api_token) VALUES ('{username}', '{hashed_password}', '{api_token}')")
+        
+        # Execute the SQL query
         cursor.execute(
             """INSERT INTO api_users 
-               (username, password_hash, api_token) 
+               (username, password, api_token) 
                VALUES (?, ?, ?)""",
             (username, hashed_password, api_token)
         )
         conn.commit()
         return jsonify({'success': True, 'token': api_token})
-    except pyodbc.IntegrityError:
-        return jsonify({'success': False, 'error': 'Username already exists'})
+    except pyodbc.IntegrityError as e:
+        # Handle unique constraint violation (e.g., username already exists)
+        conn.rollback()
+        app_logger.error(f"IntegrityError: {str(e)}")
+        return jsonify({'success': False, 'error': 'Username already exists'}), 400
+    except Exception as e:
+        # Handle other database errors
+        conn.rollback()
+        app_logger.error(f"Database error during API user creation: {str(e)}")
+        return jsonify({'success': False, 'error': 'Database error occurred'}), 500
     finally:
         cursor.close()
         conn.close()
 
 @app.route('/admin/user/<username>/toggle-admin', methods=['POST'])
-@admin_required
+@login_required
+@has_permission('manage_users')
 def toggle_admin(username):
     # Don't allow changing own admin status
     if username == session['username']:
@@ -864,60 +1688,528 @@ def toggle_admin(username):
         return jsonify({'success': True, 'is_admin': new_status})
     except Exception as e:
         conn.rollback()
-        logging.error(f"Error toggling admin status: {str(e)}")
+        app_logger.error(f"Error toggling admin status: {str(e)}")
         return jsonify({'error': 'Database error occurred'}), 500
     finally:
         cursor.close()
         conn.close()
 
 @app.route('/admin/user/<username>/toggle-disabled', methods=['POST'])
-@admin_required
+@login_required
+@has_permission('manage_users')
 def toggle_disabled(username):
+    app_logger.info(f"Received request to toggle disabled status for user: {username}")
+    
+    if not request.is_json:
+        app_logger.error(f"Invalid request format for toggle_disabled: {request.data}")
+        return jsonify({'error': 'Invalid request format'}), 400
+
+    # Validate CSRF token
+    token = request.json.get('csrf_token')
+    if not token:
+        app_logger.error("CSRF token missing in toggle_disabled request")
+        return jsonify({'error': 'CSRF token is missing'}), 400
+
+    if username == session.get('user_id'):
+        app_logger.warning(f"User {username} attempted to disable their own account")
+        return jsonify({'error': 'Cannot disable your own account'}), 400
+
+    conn = get_db_connection()
+    cursor = None
+    try:
+        cursor = conn.cursor()
+        app_logger.info(f"Checking user status for: {username}")
+
+        # Check if user exists and get current status
+        cursor.execute("""
+            SELECT username, is_admin, is_disabled 
+            FROM users 
+            WHERE username = ?
+        """, (username,))
+        user = cursor.fetchone()
+        
+        if not user:
+            app_logger.error(f"User not found: {username}")
+            return jsonify({'error': 'User not found'}), 404
+
+        current_username, is_admin, is_disabled = user
+        app_logger.info(f"Current status for {username}: admin={is_admin}, disabled={is_disabled}")
+        
+        # Prevent disabling admin users
+        if is_admin:
+            app_logger.warning(f"Attempt to disable admin user: {username}")
+            return jsonify({'error': 'Cannot disable admin users'}), 403
+
+        # Toggle disabled status
+        new_status = not is_disabled
+        app_logger.info(f"Updating disabled status for {username} to: {new_status}")
+        
+        cursor.execute("""
+            UPDATE users 
+            SET is_disabled = ? 
+            WHERE username = ?
+        """, (new_status, username))
+        
+        rows_affected = cursor.rowcount
+        app_logger.info(f"Update affected {rows_affected} rows")
+        
+        # Log out user if being disabled
+        if new_status:
+            app_logger.info(f"Deleting sessions for disabled user: {username}")
+            cursor.execute("DELETE FROM sessions WHERE username = ?", (username,))
+            sessions_deleted = cursor.rowcount
+            app_logger.info(f"Deleted {sessions_deleted} sessions for user {username}")
+            
+        conn.commit()
+        app_logger.info(f"Successfully committed changes for user {username}")
+        
+        action = "disabled" if new_status else "enabled"
+        return jsonify({
+            'success': True,
+            'message': f'User has been {action} successfully',
+            'details': {
+                'username': username,
+                'new_status': new_status,
+                'rows_affected': rows_affected
+            }
+        })
+
+    except Exception as e:
+        if cursor and conn:
+            conn.rollback()
+        app_logger.error(f"Error in toggle_disabled for {username}: {str(e)}", exc_info=True)
+        return jsonify({'error': f'An error occurred while updating user status: {str(e)}'}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+        app_logger.info(f"Completed toggle_disabled request for {username}")
+
+@app.route('/admin/user/<username>/set-vacation', methods=['POST'])
+@login_required
+@has_permission('manage_users')
+def set_vacation(username):
     if username == 'admin':
-        return jsonify({'success': False, 'message': 'Cannot disable admin user'}), 400
+        return jsonify({'success': False, 'message': 'Cannot set vacation for admin user'}), 400
+        
+    start_date = request.json.get('start_date')
+    end_date = request.json.get('end_date')
+    
+    if not start_date or not end_date:
+        return jsonify({'success': False, 'message': 'Start date and end date are required'}), 400
+        
+    try:
+        start_date = datetime.strptime(start_date, '%Y-%m-%d')
+        end_date = datetime.strptime(end_date, '%Y-%m-%d')
+    except ValueError:
+        return jsonify({'success': False, 'message': 'Invalid date format. Use YYYY-MM-DD'}), 400
+        
+    if start_date > end_date:
+        return jsonify({'success': False, 'message': 'Start date must be before end date'}), 400
         
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
-        # Get current disabled status
-        cursor.execute('SELECT is_disabled FROM users WHERE username = ?', (username,))
-        result = cursor.fetchone()
-        
-        if not result:
+        # Check if user exists
+        cursor.execute('SELECT username FROM users WHERE username = ?', (username,))
+        if not cursor.fetchone():
             return jsonify({'success': False, 'message': 'User not found'}), 404
             
-        new_status = not result[0]
-        
-        # Update disabled status
+        # Update vacation period
         cursor.execute('''
             UPDATE users 
-            SET is_disabled = ?
+            SET vacation_start = ?,
+                vacation_end = ?
             WHERE username = ?
-        ''', (new_status, username))
+        ''', (start_date, end_date, username))
         
         conn.commit()
-        status_text = 'disabled' if new_status else 'enabled'
         return jsonify({
             'success': True, 
-            'message': f'User {username} has been {status_text}',
-            'is_disabled': new_status
+            'message': f'Vacation period set for {username} from {start_date.strftime("%Y-%m-%d")} to {end_date.strftime("%Y-%m-%d")}'
         })
         
     except Exception as e:
         conn.rollback()
-        logging.error(f"Error toggling user disabled status: {str(e)}")
+        app_logger.error(f"Error setting vacation period: {str(e)}")
         return jsonify({'success': False, 'message': str(e)}), 500
     finally:
         cursor.close()
         conn.close()
+
+@app.route('/admin/user/<username>/clear-vacation', methods=['POST'])
+@login_required
+@has_permission('manage_users')
+def clear_vacation(username):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute('''
+            UPDATE users 
+            SET vacation_start = NULL,
+                vacation_end = NULL
+            WHERE username = ?
+        ''', (username,))
+        
+        conn.commit()
+        return jsonify({
+            'success': True, 
+            'message': f'Vacation period cleared for {username}'
+        })
+        
+    except Exception as e:
+        conn.rollback()
+        app_logger.error(f"Error clearing vacation period: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/admin/groups')
+@login_required
+@has_permission('manage_groups')
+def manage_groups():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Get all groups with their permissions
+    cursor.execute('''
+        SELECT 
+            g.group_id,
+            g.group_name,
+            g.description,
+            COALESCE(STRING_AGG(p.permission_name, ', '), '') as permissions
+        FROM groups g
+        LEFT JOIN group_permissions gp ON g.group_id = gp.group_id
+        LEFT JOIN permissions p ON gp.permission_id = p.permission_id
+        GROUP BY g.group_id, g.group_name, g.description
+    ''')
+    
+    groups = cursor.fetchall()
+    
+    # Get all available permissions
+    cursor.execute('SELECT permission_id, permission_name, description FROM permissions')
+    permissions = cursor.fetchall()
+    
+    cursor.close()
+    conn.close()
+    
+    return render_template('groups.html', groups=groups, permissions=permissions)
+
+@app.route('/admin/groups/add', methods=['POST'])
+@login_required
+@has_permission('manage_groups')
+def add_group():
+    group_name = request.form.get('group_name')
+    description = request.form.get('description')
+    permissions = request.form.getlist('permissions')
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        # Add new group
+        cursor.execute('''
+            INSERT INTO groups (group_name, description)
+            OUTPUT INSERTED.group_id
+            VALUES (?, ?)
+        ''', (group_name, description))
+        
+        group_id = cursor.fetchone()[0]
+        
+        # Add permissions
+        for permission_id in permissions:
+            cursor.execute('''
+                INSERT INTO group_permissions (group_id, permission_id)
+                VALUES (?, ?)
+            ''', (group_id, permission_id))
+        
+        conn.commit()
+        flash('Group added successfully', 'success')
+    except Exception as e:
+        conn.rollback()
+        flash(f'Error adding group: {str(e)}', 'error')
+    finally:
+        cursor.close()
+        conn.close()
+    
+    return redirect(url_for('manage_groups'))
+
+@app.route('/admin/groups/<int:group_id>/edit', methods=['POST'])
+@login_required
+@has_permission('manage_groups')
+def edit_group(group_id):
+    group_name = request.form.get('group_name')
+    description = request.form.get('description')
+    permissions = request.form.getlist('permissions')
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        # Update group details
+        cursor.execute('''
+            UPDATE groups
+            SET group_name = ?, description = ?
+            WHERE group_id = ?
+        ''', (group_name, description, group_id))
+        
+        # Remove existing permissions
+        cursor.execute('DELETE FROM group_permissions WHERE group_id = ?', (group_id,))
+        
+        # Add new permissions
+        for permission_id in permissions:
+            cursor.execute('''
+                INSERT INTO group_permissions (group_id, permission_id)
+                VALUES (?, ?)
+            ''', (group_id, permission_id))
+        
+        conn.commit()
+        flash('Group updated successfully', 'success')
+    except Exception as e:
+        conn.rollback()
+        flash(f'Error updating group: {str(e)}', 'error')
+    finally:
+        cursor.close()
+        conn.close()
+    
+    return redirect(url_for('manage_groups'))
+
+@app.route('/admin/groups/<int:group_id>/delete', methods=['POST'])
+@login_required
+@has_permission('manage_groups')
+def delete_group(group_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        # Delete group (cascade will handle related records)
+        cursor.execute('DELETE FROM groups WHERE group_id = ?', (group_id,))
+        conn.commit()
+        flash('Group deleted successfully', 'success')
+    except Exception as e:
+        conn.rollback()
+        flash(f'Error deleting group: {str(e)}', 'error')
+    finally:
+        cursor.close()
+        conn.close()
+    
+    return redirect(url_for('manage_groups'))
+
+@app.route('/admin/users/<username>/groups', methods=['POST'])
+@login_required
+@has_permission('manage_users')
+def update_user_groups(username):
+    groups = request.form.getlist('groups')
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        # Remove existing group assignments
+        cursor.execute('DELETE FROM user_groups WHERE username = ?', (username,))
+        
+        # Add new group assignments
+        for group_id in groups:
+            cursor.execute('''
+                INSERT INTO user_groups (username, group_id)
+                VALUES (?, ?)
+            ''', (username, group_id))
+        
+        conn.commit()
+        flash('User groups updated successfully', 'success')
+    except Exception as e:
+        conn.rollback()
+        flash(f'Error updating user groups: {str(e)}', 'error')
+    finally:
+        cursor.close()
+        conn.close()
+    
+    return redirect(url_for('admin_dashboard'))
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('is_admin'):
+            security_logger.warning('Unauthorized admin access attempt', extra={
+                'user': session.get('user_id', 'unknown'),
+                'ip': request.remote_addr,
+                'endpoint': request.endpoint
+            })
+            flash('You do not have permission to access this page', 'danger')
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+def has_permission(permission_name):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            username = session.get('user_id')
+            if not username:
+                security_logger.warning('Permission check failed - no user in session', extra={
+                    'permission': permission_name,
+                    'ip': request.remote_addr,
+                    'endpoint': request.endpoint
+                })
+                return redirect(url_for('login'))
+                
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            
+            try:
+                cursor.execute("""
+                    SELECT p.permission_name
+                    FROM user_groups ug
+                    JOIN group_permissions gp ON ug.group_id = gp.group_id
+                    JOIN permissions p ON gp.permission_id = p.permission_id
+                    WHERE ug.username = ?
+                """, username)
+                
+                user_permissions = {row[0] for row in cursor.fetchall()}
+                
+                if permission_name not in user_permissions:
+                    security_logger.warning('Permission denied', extra={
+                        'user': username,
+                        'permission': permission_name,
+                        'ip': request.remote_addr,
+                        'endpoint': request.endpoint
+                    })
+                    flash('You do not have permission to perform this action', 'danger')
+                    return redirect(url_for('index'))
+                    
+                audit_logger.log_action('permission_check', username, details={'permission': permission_name})
+                return f(*args, **kwargs)
+                
+            except Exception as e:
+                error_logger.exception('Error checking permissions', extra={
+                    'user': username,
+                    'permission': permission_name
+                })
+                flash('An error occurred while checking permissions', 'danger')
+                return redirect(url_for('index'))
+            finally:
+                cursor.close()
+                conn.close()
+                
+        return decorated_function
+    return decorator
+
+@app.route('/change_password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    if request.method == 'POST':
+        current_password = request.form.get('current_password')
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+        
+        # Validate input
+        if not all([current_password, new_password, confirm_password]):
+            flash('All fields are required', 'error')
+            return redirect(url_for('change_password'))
+            
+        if new_password != confirm_password:
+            flash('New passwords do not match', 'error')
+            return redirect(url_for('change_password'))
+            
+        if len(new_password) < 8:
+            flash('Password must be at least 8 characters long', 'error')
+            return redirect(url_for('change_password'))
+            
+        # Check current password and update
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("SELECT password FROM users WHERE username = ?", (session['user_id'],))
+            result = cursor.fetchone()
+            
+            if not result or not check_password_hash(result[0], current_password):
+                flash('Current password is incorrect', 'error')
+                return redirect(url_for('change_password'))
+            
+            # Update password
+            hashed_password = generate_password_hash(new_password)
+            cursor.execute("UPDATE users SET password = ? WHERE username = ?", 
+                         (hashed_password, session['user_id']))
+            conn.commit()
+            
+            flash('Password changed successfully', 'success')
+            return redirect(url_for('index'))
+            
+        except Exception as e:
+            conn.rollback()
+            app_logger.error(f"Error changing password: {str(e)}")
+            flash('An error occurred while changing password', 'error')
+            return redirect(url_for('change_password'))
+            
+        finally:
+            cursor.close()
+            conn.close()
+    
+    return render_template('change_password.html')
+
+@app.route('/admin/user/<username>/reset_password', methods=['POST'])
+@login_required
+@has_permission('manage_users')
+def reset_user_password(username):
+    if not request.is_json:
+        return jsonify({'error': 'Invalid request format'}), 400
+        
+    new_password = request.json.get('new_password')
+    if not new_password:
+        return jsonify({'error': 'New password is required'}), 400
+        
+    # Validate password requirements
+    if len(new_password) < 8:
+        return jsonify({'error': 'Password must be at least 8 characters long'}), 400
+        
+    if not (re.search(r'[A-Z]', new_password) and 
+            re.search(r'[a-z]', new_password) and 
+            re.search(r'\d', new_password) and 
+            re.search(r'[@$!%*?&]', new_password)):
+        return jsonify({'error': 'Password must contain uppercase, lowercase, number, and special character'}), 400
+    
+    conn = get_db_connection()
+    cursor = None
+    try:
+        cursor = conn.cursor()
+        
+        # Check if user exists
+        cursor.execute("SELECT username FROM users WHERE username = ?", (username,))
+        if not cursor.fetchone():
+            return jsonify({'error': 'User not found'}), 404
+            
+        # Update password
+        hashed_password = generate_password_hash(new_password)
+        cursor.execute("UPDATE users SET password = ? WHERE username = ?", 
+                      (hashed_password, username))
+        conn.commit()
+        
+        audit_logger.log_action('reset_password', details={'target_user': username})
+        return jsonify({'success': True, 'message': f'Password reset successful for user {username}'})
+        
+    except Exception as e:
+        app_logger.error(f"Error resetting password for {username}: {str(e)}")
+        if cursor:
+            conn.rollback()
+        return jsonify({'error': 'An error occurred while resetting the password'}), 500
+        
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 @app.route('/search-page')
 @login_required
 def search_page():
     return render_template('search.html')
 
-@app.route('/export')
+@app.route('/export', methods=['POST'])
 @login_required
+@has_permission('export_results')
 def export_results():
     try:
         # Get search parameters (same as search route)
@@ -1019,117 +2311,119 @@ def export_results():
         )
         
     except Exception as e:
-        logging.error(f"Export error: {str(e)}")
+        app_logger.error(f"Export error: {str(e)}")
         return jsonify({'error': 'An error occurred during export'}), 500
     finally:
         cursor.close()
         conn.close()
 
-@app.route('/admin/user/<username>/set-vacation', methods=['POST'])
-@admin_required
-def set_vacation(username):
-    if username == 'admin':
-        return jsonify({'success': False, 'message': 'Cannot set vacation for admin user'}), 400
-        
-    start_date = request.json.get('start_date')
-    end_date = request.json.get('end_date')
-    
-    if not start_date or not end_date:
-        return jsonify({'success': False, 'message': 'Start date and end date are required'}), 400
-        
+@app.route('/export-csv', methods=['GET'])
+@login_required
+@has_permission('export_results')
+def export_csv():
     try:
-        start_date = datetime.strptime(start_date, '%Y-%m-%d')
-        end_date = datetime.strptime(end_date, '%Y-%m-%d')
-    except ValueError:
-        return jsonify({'success': False, 'message': 'Invalid date format. Use YYYY-MM-DD'}), 400
+        # Get search parameters (same as search_ops)
+        op_number = request.args.get('op_number', '').strip()
+        name = request.args.get('name', '').strip()
+        id1 = request.args.get('id1', '').strip()
+        id2 = request.args.get('id2', '').strip()
+        date_from = request.args.get('date_from')
+        date_to = request.args.get('date_to')
+        sort_by = request.args.get('sort_by', 'created_at')
+        sort_order = request.args.get('sort_order', 'desc')
         
-    if start_date > end_date:
-        return jsonify({'success': False, 'message': 'Start date must be before end date'}), 400
+        conn = get_db_connection()
+        cursor = conn.cursor()
         
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    try:
-        # Check if user exists
-        cursor.execute('SELECT username FROM users WHERE username = ?', (username,))
-        if not cursor.fetchone():
-            return jsonify({'success': False, 'message': 'User not found'}), 404
+        # Build the base query
+        query = """
+            SELECT op_number, name, id1, id2, created_at
+            FROM records
+            WHERE 1=1
+        """
+        params = []
+        
+        # Add search conditions
+        if op_number:
+            query += " AND CAST(op_number AS VARCHAR) LIKE ?"
+            params.append(f'%{op_number}%')
             
-        # Update vacation period
-        cursor.execute('''
-            UPDATE users 
-            SET vacation_start = ?,
-                vacation_end = ?
-            WHERE username = ?
-        ''', (start_date, end_date, username))
+        if name:
+            query += " AND name LIKE ?"
+            params.append(f'%{name}%')
+            
+        if id1:
+            query += " AND id1 LIKE ?"
+            params.append(f'%{id1}%')
+            
+        if id2:
+            query += " AND id2 LIKE ?"
+            params.append(f'%{id2}%')
+            
+        if date_from:
+            query += " AND created_at >= ?"
+            params.append(date_from)
+            
+        if date_to:
+            query += " AND created_at <= ?"
+            params.append(date_to)
         
-        conn.commit()
-        return jsonify({
-            'success': True, 
-            'message': f'Vacation period set for {username} from {start_date.strftime("%Y-%m-%d")} to {end_date.strftime("%Y-%m-%d")}'
-        })
+        # Add sorting
+        sort_column = {
+            'op_number': 'op_number',
+            'name': 'name',
+            'id1': 'id1',
+            'id2': 'id2',
+            'created_at': 'created_at'
+        }.get(sort_by, 'created_at')
         
-    except Exception as e:
-        conn.rollback()
-        logging.error(f"Error setting vacation period: {str(e)}")
-        return jsonify({'success': False, 'message': str(e)}), 500
-    finally:
-        cursor.close()
-        conn.close()
-
-@app.route('/admin/user/<username>/clear-vacation', methods=['POST'])
-@admin_required
-def clear_vacation(username):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    try:
-        cursor.execute('''
-            UPDATE users 
-            SET vacation_start = NULL,
-                vacation_end = NULL
-            WHERE username = ?
-        ''', (username,))
+        query += f" ORDER BY {sort_column} {sort_order.upper()}"
         
-        conn.commit()
-        return jsonify({
-            'success': True, 
-            'message': f'Vacation period cleared for {username}'
-        })
+        # Execute query
+        cursor.execute(query, params)
+        records = cursor.fetchall()
         
-    except Exception as e:
-        conn.rollback()
-        logging.error(f"Error clearing vacation period: {str(e)}")
-        return jsonify({'success': False, 'message': str(e)}), 500
-    finally:
-        cursor.close()
-        conn.close()
-
-@app.route('/admin/user/<username>/delete-vacation', methods=['POST'])
-@admin_required
-def delete_vacation(username):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    try:
-        cursor.execute('SELECT username FROM users WHERE username = ?', (username,))
-        if not cursor.fetchone():
-            return jsonify({'success': False, 'message': 'User not found'}), 404
-
-        cursor.execute('''
-            UPDATE users 
-            SET vacation_start = NULL,
-                vacation_end = NULL
-            WHERE username = ?
-        ''', (username,))
+        # Create CSV in memory
+        si = io.StringIO()
+        csv_writer = csv.writer(si)
         
-        conn.commit()
-        return jsonify({
-            'success': True, 
-            'message': f'Vacation period deleted for {username}'
-        })
+        # Write headers
+        csv_writer.writerow(['OP Number', 'Name', 'ID1', 'ID2', 'Created At'])
+        
+        # Write data
+        for record in records:
+            csv_writer.writerow([
+                record[0],
+                record[1],
+                record[2],
+                record[3],
+                record[4].strftime('%Y-%m-%d %H:%M:%S') if record[4] else ''
+            ])
+        
+        # Create the response
+        output = si.getvalue()
+        si.close()
+        
+        # Generate filename with timestamp
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f'op_records_{timestamp}.csv'
+        
+        # Log the export
+        audit_logger.log_action('export_csv', session['user_id'], 
+                              details={'filename': filename, 'record_count': len(records)})
+        
+        # Return CSV file
+        response = Response(output)
+        response.headers['Content-Disposition'] = f'attachment; filename={filename}'
+        response.headers['Content-type'] = 'text/csv'
+        return response
         
     except Exception as e:
-        conn.rollback()
-        logging.error(f"Error deleting vacation period: {str(e)}")
-        return jsonify({'success': False, 'message': str(e)}), 500
+        error_logger.exception("CSV export error")
+        return jsonify({
+            'success': False,
+            'error': 'An error occurred while exporting data'
+        }), 500
     finally:
         cursor.close()
         conn.close()
