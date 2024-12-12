@@ -173,8 +173,9 @@
                             <th>Full Name</th>
                             <th>Status</th>
                             <th>Admin</th>
+                            <th>Groups</th>
                             <th>Vacation</th>
-                            <th>Computer Name</th>
+                            <th>Active Sessions</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -200,6 +201,11 @@
                                 {% endif %}
                             </td>
                             <td>
+                                <button class="btn btn-sm btn-outline-primary" onclick="showGroupsModal('{{ user.username }}', {{ user.groups|tojson }})">
+                                    Manage Groups
+                                </button>
+                            </td>
+                            <td>
                                 {% if user.vacation_start and user.vacation_end %}
                                     <span class="badge bg-info">
                                         {{ user.vacation_start.strftime('%Y-%m-%d') }} to {{ user.vacation_end.strftime('%Y-%m-%d') }}
@@ -207,28 +213,56 @@
                                     <button class="btn btn-sm btn-outline-danger" onclick="clearVacation('{{ user.username }}')">
                                         <i class="fas fa-times"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteVacation('{{ user.username }}')">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
                                 {% else %}
                                     <button class="btn btn-sm btn-outline-primary" onclick="showSetVacationModal('{{ user.username }}')">
                                         <i class="fas fa-calendar-plus"></i> Set
                                     </button>
                                 {% endif %}
                             </td>
-                            <td>{{ user.computer_name }}</td>
+                            <td>
+                                {% if user.sessions %}
+                                    <div class="d-flex flex-column gap-2">
+                                        {% for session in user.sessions %}
+                                            <div class="session-info p-2 border rounded bg-light">
+                                                {% if session.computer_name %}
+                                                    <div class="text-muted small">
+                                                        <i class="fas fa-desktop me-1"></i>{{ session.computer_name }}
+                                                    </div>
+                                                {% endif %}
+                                                {% if session.ip_address %}
+                                                    <div class="text-muted small">
+                                                        <i class="fas fa-network-wired me-1"></i>{{ session.ip_address }}
+                                                    </div>
+                                                {% endif %}
+                                                {% if session.login_time %}
+                                                    <div class="text-muted small">
+                                                        <i class="fas fa-clock me-1"></i>{{ session.login_time.strftime('%Y-%m-%d %H:%M:%S') }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <small class="text-muted">No active sessions</small>
+                                {% endif %}
+                            </td>
                             <td>
                                 {% if not user.is_approved %}
-                                    <button class="btn btn-success btn-sm" onclick="approveUser('{{ user.username }}')">
-                                        <i class="fas fa-check me-1"></i>Approve
-                                    </button>
+                                <button class="btn btn-success btn-sm" onclick="approveUser('{{ user.username }}')">
+                                    <i class="fas fa-check me-1"></i>Approve
+                                </button>
                                 {% endif %}
-                                <button class="btn btn-warning btn-sm" onclick="toggleDisabled('{{ user.username }}', {{ user.is_disabled|tojson }})">
+
+                                <button class="btn {% if user.is_disabled %}btn-success{% else %}btn-warning{% endif %} btn-sm" 
+                                        onclick="toggleDisabled('{{ user.username }}', {{ user.is_disabled|tojson }})">
+                                    <i class="fas {% if user.is_disabled %}fa-unlock{% else %}fa-lock{% endif %} me-1"></i>
+                                    {% if user.is_disabled %}Enable{% else %}Disable{% endif %}
+                                </button>
+                                <button class="btn btn-warning btn-sm" onclick="toggleAdmin('{{ user.username }}', {{ user.is_admin|tojson }})">
                                     <i class="fas fa-user-shield me-1"></i>{{ 'Remove Admin' if user.is_admin else 'Make Admin' }}
                                 </button>
-                                <button class="btn {% if user.is_disabled %}btn-success{% else %}btn-danger{% endif %} btn-sm" onclick="toggleDisabled('{{ user.username }}', {{ user.is_disabled|tojson }})">
-                                    <i class="fas {% if user.is_disabled %}fa-user-check{% else %}fa-user-slash{% endif %} me-1"></i>
-                                    {{ 'Enable' if user.is_disabled else 'Disable' }}
+                                <button class="btn btn-info btn-sm" onclick="resetPassword('{{ user.username }}')">
+                                    <i class="fas fa-key me-1"></i>Reset Password
                                 </button>
                                 <button class="btn btn-danger btn-sm" onclick="deleteUser('{{ user.username }}')">
                                     <i class="fas fa-trash me-1"></i>Delete
@@ -296,6 +330,7 @@
             </div>
             <div class="modal-body">
                 <form id="newApiUserForm">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
                         <label for="apiUsername" class="form-label">Username</label>
                         <input type="text" class="form-control" id="apiUsername" required>
@@ -324,18 +359,96 @@
             </div>
             <div class="modal-body">
                 <input type="hidden" id="vacation-username">
-                <div class="mb-3">
-                    <label for="vacation-start" class="form-label">Start Date</label>
-                    <input type="date" class="form-control" id="vacation-start" required>
-                </div>
-                <div class="mb-3">
-                    <label for="vacation-end" class="form-label">End Date</label>
-                    <input type="date" class="form-control" id="vacation-end" required>
-                </div>
+                <form id="vacationForm">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label for="vacation-start" class="form-label">Start Date</label>
+                        <input type="date" class="form-control" id="vacation-start" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="vacation-end" class="form-label">End Date</label>
+                        <input type="date" class="form-control" id="vacation-end" required>
+                    </div>
+                </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary" onclick="setVacation()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Groups Management Modal -->
+<div class="modal fade" id="groupsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Manage User Groups</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="groupsForm" action="" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Select Groups</label>
+                        {% for group in all_groups %}
+                        <div class="form-check">
+                            <input class="form-check-input group-checkbox" type="checkbox" name="groups" value="{{ group.group_id }}" id="group_{{ group.group_id }}">
+                            <label class="form-check-label" for="group_{{ group.group_id }}">
+                                {{ group.group_name }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Reset Password Modal -->
+<div class="modal fade" id="resetPasswordModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Reset User Password</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Set a new password for <strong id="resetPasswordUsername"></strong></p>
+                <form id="resetPasswordForm">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label">New Password</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="newPassword" 
+                                   required minlength="8"
+                                   pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$">
+                            <button class="btn btn-outline-secondary" type="button" id="toggleNewPassword">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="password-requirements">
+                        <small>Password Requirements:</small>
+                        <ul>
+                            <li id="reset-length-check"><i class="fas fa-times"></i>At least 8 characters long</li>
+                            <li id="reset-lowercase-check"><i class="fas fa-times"></i>One lowercase letter</li>
+                            <li id="reset-uppercase-check"><i class="fas fa-times"></i>One uppercase letter</li>
+                            <li id="reset-number-check"><i class="fas fa-times"></i>One number</li>
+                            <li id="reset-special-check"><i class="fas fa-times"></i>One special character (@$!%*?&)</li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="confirmResetPassword()">Reset Password</button>
             </div>
         </div>
     </div>
@@ -349,96 +462,136 @@
     }
 
     function approveUser(username) {
-        if (confirm('Are you sure you want to approve this user?')) {
-            fetch(`/admin/user/${username}/approve`, {
-                method: 'POST',
-            }).then(response => response.json())
-              .then(data => {
-                  if (data.success) {
-                      location.reload();
-                  } else {
-                      alert('Error approving user');
-                  }
-              });
+        if (!confirm(`Are you sure you want to approve user ${username}?`)) {
+            return;
         }
+
+        fetch(`/admin/user/${username}/approve`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                csrf_token: '{{ csrf_token() }}'
+            })
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    alert(`User ${username} has been approved successfully!`);
+                    location.reload();
+                } else {
+                    alert('Error approving user: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('An error occurred while approving the user. Please try again.');
+            });
     }
 
     function toggleAdmin(username, isCurrentlyAdmin) {
         const action = isCurrentlyAdmin ? 'remove admin privileges from' : 'make admin';
-        if (confirm(`Are you sure you want to ${action} this user?`)) {
-            fetch(`/admin/user/${username}/toggle-admin`, {
-                method: 'POST',
-            }).then(response => response.json())
-              .then(data => {
-                  if (data.success) {
-                      location.reload();
-                  } else {
-                      alert(data.error || 'Error toggling admin status');
-                  }
-              });
-        }
-    }
-
-    function toggleDisabled(username, isCurrentlyDisabled) {
-        if (!confirm(`Are you sure you want to ${isCurrentlyDisabled ? 'enable' : 'disable'} user ${username}?`)) {
+        if (!confirm(`Are you sure you want to ${action} this user?`)) {
             return;
         }
+
+        fetch(`/admin/user/${username}/toggle-admin`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                is_admin: !isCurrentlyAdmin, // Toggle the admin status
+            }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    alert(`User ${username} has been ${data.is_admin ? 'granted' : 'removed from'} admin privileges!`);
+                    location.reload();
+                } else {
+                    alert('Error toggling admin status: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('An error occurred while toggling admin status. Please try again.');
+            });
+    }
+
+    function toggleDisabled(username, currentStatus) {
+        const action = currentStatus ? 'enable' : 'disable';
+        if (!confirm(`Are you sure you want to ${action} user ${username}?`)) {
+            return;
+        }
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         
         fetch(`/admin/user/${username}/toggle-disabled`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
-            }
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({
+                csrf_token: csrfToken,
+                username: username,
+                action: action
+            }),
+            credentials: 'same-origin'
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(data.error || `HTTP error! status: ${response.status}`);
+                });
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
-                showAlert('success', data.message);
-                
-                // Update UI dynamically
-                const userRow = document.querySelector(`tr[data-username="${username}"]`);
-                if (userRow) {
-                    const statusCell = userRow.querySelector('td:nth-child(3)');
-                    const actionButton = userRow.querySelector('button[onclick^="toggleDisabled"]');
-                    
-                    if (data.is_disabled) {
-                        statusCell.innerHTML = '<span class="badge bg-danger">Disabled</span>';
-                        actionButton.innerHTML = '<i class="fas fa-user-check me-1"></i>Enable';
-                        actionButton.classList.remove('btn-danger');
-                        actionButton.classList.add('btn-success');
-                    } else {
-                        statusCell.innerHTML = '<span class="badge bg-success">Active</span>';
-                        actionButton.innerHTML = '<i class="fas fa-user-slash me-1"></i>Disable';
-                        actionButton.classList.remove('btn-success');
-                        actionButton.classList.add('btn-danger');
-                    }
-                    
-                    // Update the onclick handler with new status
-                    actionButton.setAttribute('onclick', `toggleDisabled('${username}', ${!data.is_disabled})`);
-                }
+                alert(`User ${username} has been ${action}d successfully!`);
+                location.reload();
             } else {
-                showAlert('danger', data.message || 'Error toggling user status');
+                throw new Error(data.error || 'Unknown error occurred');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            showAlert('danger', 'Error toggling user status');
+            alert(error.message || 'An error occurred while updating user status. Please try again.');
         });
     }
 
     function deleteUser(username) {
-        if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
-            fetch(`/admin/user/${username}`, {
-                method: 'DELETE',
-            }).then(response => response.json())
-              .then(data => {
-                  if (data.success) {
-                      location.reload();
-                  } else {
-                      alert('Error deleting user');
-                  }
-              });
+        if (!confirm(`Are you sure you want to delete user ${username}? This action cannot be undone.`)) {
+            return;
         }
+
+        fetch(`/admin/user/${username}/delete`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                csrf_token: '{{ csrf_token() }}'
+            })
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.success) {
+                alert(`User ${username} has been deleted successfully!`);
+                location.reload();
+            } else {
+                alert('Error deleting user: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            alert('An error occurred while deleting the user. Please try again.');
+        });
     }
 
     function regenerateToken(username) {
@@ -472,34 +625,167 @@
     }
 
     function createApiUser() {
-        const username = document.getElementById('apiUsername').value;
-        const password = document.getElementById('apiPassword').value;
+    const username = document.getElementById('apiUsername').value;
+    const password = document.getElementById('apiPassword').value;
 
-        fetch('/admin/api-user', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                username: username,
-                password: password,
-            }),
-        }).then(response => response.json())
-          .then(data => {
-              if (data.success) {
-                  location.reload();
-              } else {
-                  alert('Error creating API user');
-              }
-          });
-    }
+    fetch('/admin/api-user', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            username: username,
+            password: password,
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('API user created successfully!');
+            // Refresh the list of API users
+            fetchApiUsers();
+        } else {
+            alert('Error creating API user: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        alert('An error occurred while creating the API user. Please try again.');
+    });
+}    
+
+function fetchApiUsers() {
+    fetch('/admin/api-users')
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update the UI with the new list of API users
+            updateApiUsersList(data.api_users);
+        } else {
+            alert('Error fetching API users: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        alert('An error occurred while fetching the API users. Please try again.');
+    });
+}
+
+function updateApiUsersList(apiUsers) {
+    const apiUsersList = document.getElementById('apiUsersList');
+    apiUsersList.innerHTML = ''; // Clear the current list
+
+    apiUsers.forEach(apiUser => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${apiUser.username}</td>
+            <td><code>${apiUser.token.substring(0, 10)}...</code></td>
+            <td>
+                <button class="btn btn-warning btn-sm" onclick="regenerateToken('${apiUser.username}')">
+                    <i class="fas fa-sync-alt me-1"></i>New Token
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="deleteApiUser('${apiUser.username}')">
+                    <i class="fas fa-trash me-1"></i>Delete
+                </button>
+            </td>
+        `;
+        apiUsersList.appendChild(row);
+    });
+}
 
     let vacationModal;
+    let groupsModal;
+    let resetPasswordModal;
     
     document.addEventListener('DOMContentLoaded', function() {
         vacationModal = new bootstrap.Modal(document.getElementById('vacationModal'));
+        groupsModal = new bootstrap.Modal(document.getElementById('groupsModal'));
+        resetPasswordModal = new bootstrap.Modal(document.getElementById('resetPasswordModal'));
+        
+        // Password visibility toggle
+        document.getElementById('toggleNewPassword').addEventListener('click', function() {
+            const password = document.getElementById('newPassword');
+            const icon = this.querySelector('i');
+            if (password.type === 'password') {
+                password.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                password.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+
+        // Password requirements checker
+        document.getElementById('newPassword').addEventListener('input', function() {
+            const password = this.value;
+            
+            const requirements = {
+                'reset-length-check': password.length >= 8,
+                'reset-lowercase-check': /[a-z]/.test(password),
+                'reset-uppercase-check': /[A-Z]/.test(password),
+                'reset-number-check': /[0-9]/.test(password),
+                'reset-special-check': /[@$!%*?&]/.test(password)
+            };
+
+            for (const [id, met] of Object.entries(requirements)) {
+                const element = document.getElementById(id);
+                const icon = element.querySelector('i');
+                
+                if (met) {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-check');
+                    icon.style.color = '#1cc88a';
+                } else {
+                    icon.classList.remove('fa-check');
+                    icon.classList.add('fa-times');
+                    icon.style.color = '#dc3545';
+                }
+            }
+        });
     });
-    
+
+    function resetPassword(username) {
+        document.getElementById('resetPasswordUsername').textContent = username;
+        document.getElementById('newPassword').value = '';
+        resetPasswordModal.show();
+    }
+
+    function confirmResetPassword() {
+        const username = document.getElementById('resetPasswordUsername').textContent;
+        const newPassword = document.getElementById('newPassword').value;
+        
+        // Validate password
+        const isValid = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(newPassword);
+        if (!isValid) {
+            alert('Please ensure the password meets all requirements');
+            return;
+        }
+
+        fetch(`/admin/user/${username}/reset_password`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ new_password: newPassword })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                resetPasswordModal.hide();
+                alert(`Password reset successful for user ${username}`);
+            } else {
+                alert('Error resetting password: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while resetting the password');
+        });
+    }
+
     function showSetVacationModal(username) {
         document.getElementById('vacation-username').value = username;
         vacationModal.show();
@@ -509,127 +795,79 @@
         const username = document.getElementById('vacation-username').value;
         const startDate = document.getElementById('vacation-start').value;
         const endDate = document.getElementById('vacation-end').value;
-        
+
         if (!startDate || !endDate) {
-            showAlert('danger', 'Please select both start and end dates');
+            alert('Please select both start and end dates');
             return;
         }
-        
+
         fetch(`/admin/user/${username}/set-vacation`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify({
                 start_date: startDate,
-                end_date: endDate
-            })
+                end_date: endDate,
+            }),
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showAlert('success', data.message);
-                vacationModal.hide();
-                
-                // Update UI dynamically
-                const userRow = document.querySelector(`tr[data-username="${username}"]`);
-                if (userRow) {
-                    const vacationCell = userRow.querySelector('td:nth-child(5)');
-                    const formattedStartDate = new Date(startDate).toISOString().split('T')[0];
-                    const formattedEndDate = new Date(endDate).toISOString().split('T')[0];
-                    
-                    vacationCell.innerHTML = `
-                        <span class="badge bg-info">
-                            ${formattedStartDate} to ${formattedEndDate}
-                        </span>
-                        <button class="btn btn-sm btn-outline-danger" onclick="clearVacation('${username}')">
-                            <i class="fas fa-times"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteVacation('${username}')">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    `;
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    alert('Vacation period saved successfully!');
+                    vacationModal.hide();
+                    location.reload();
+                } else {
+                    alert('Error saving vacation period: ' + (data.message || 'Unknown error'));
                 }
-            } else {
-                showAlert('danger', data.message || 'Error setting vacation period');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showAlert('danger', 'Error setting vacation period');
-        });
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('An error occurred while saving the vacation period. Please try again.');
+            });
     }
-    
+
     function clearVacation(username) {
         if (!confirm('Are you sure you want to clear the vacation period for this user?')) {
             return;
         }
-        
+
         fetch(`/admin/user/${username}/clear-vacation`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
-            }
+                'Content-Type': 'application/json',
+            },
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showAlert('success', data.message);
-                
-                // Update UI dynamically
-                const userRow = document.querySelector(`tr[data-username="${username}"]`);
-                if (userRow) {
-                    const vacationCell = userRow.querySelector('td:nth-child(5)');
-                    vacationCell.innerHTML = `
-                        <button class="btn btn-sm btn-outline-primary" onclick="showSetVacationModal('${username}')">
-                            <i class="fas fa-calendar-plus"></i> Set
-                        </button>
-                    `;
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    alert('Vacation period cleared successfully!');
+                    location.reload();
+                } else {
+                    alert('Error clearing vacation period: ' + (data.message || 'Unknown error'));
                 }
-            } else {
-                showAlert('danger', data.message || 'Error clearing vacation period');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showAlert('danger', 'Error clearing vacation period');
-        });
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('An error occurred while clearing the vacation period. Please try again.');
+            });
     }
 
-    function deleteVacation(username) {
-        if (!confirm('Are you sure you want to delete the vacation period for this user?')) {
-            return;
-        }
+    function showGroupsModal(username, userGroups) {
+        // Reset form
+        const form = document.getElementById('groupsForm');
+        form.reset();
+        form.action = `/admin/users/${username}/groups`;
         
-        fetch(`/admin/user/${username}/delete-vacation`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
+        // Check the groups the user belongs to
+        const checkboxes = document.querySelectorAll('.group-checkbox');
+        checkboxes.forEach(checkbox => {
+            if (userGroups.includes(parseInt(checkbox.value))) {
+                checkbox.checked = true;
             }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showAlert('success', data.message);
-                
-                // Update UI dynamically
-                const userRow = document.querySelector(`tr[data-username="${username}"]`);
-                if (userRow) {
-                    const vacationCell = userRow.querySelector('td:nth-child(5)');
-                    vacationCell.innerHTML = `
-                        <button class="btn btn-sm btn-outline-primary" onclick="showSetVacationModal('${username}')">
-                            <i class="fas fa-calendar-plus"></i> Set
-                        </button>
-                    `;
-                }
-            } else {
-                showAlert('danger', data.message || 'Error deleting vacation period');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showAlert('danger', 'Error deleting vacation period');
         });
+        
+        groupsModal.show();
     }
 </script>
 {% endblock %}

@@ -39,7 +39,45 @@
         margin: 0;
         opacity: 0.8;
     }
+
+    .fc-event {
+        cursor: pointer;
+        padding: 2px 4px;
+    }
+    .fc-event-title {
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .vacation-calendar {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        margin-bottom: 2rem;
+    }
+    .vacation-legend {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+        padding: 0.5rem;
+        background: #f8f9fc;
+        border-radius: 4px;
+    }
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+    }
+    .legend-color {
+        width: 12px;
+        height: 12px;
+        border-radius: 2px;
+    }
 </style>
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -71,6 +109,30 @@
         <a href="{{ url_for('view_sessions') }}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
             <i class="fas fa-history fa-sm text-white-50"></i> View User Sessions
         </a>
+    </div>
+
+    <!-- Vacation Calendar -->
+    <div class="vacation-calendar">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="mb-0">
+                <i class="fas fa-calendar-alt me-2"></i>
+                Vacation Calendar
+            </h5>
+            <button class="btn btn-primary btn-sm" onclick="refreshCalendar()">
+                <i class="fas fa-sync-alt me-2"></i>Refresh
+            </button>
+        </div>
+        <div id="vacation-calendar"></div>
+        <div class="vacation-legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #4e73df"></div>
+                <span>Current User</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #858796"></div>
+                <span>Other Users</span>
+            </div>
+        </div>
     </div>
 
     <!-- User Sessions Table -->
@@ -263,32 +325,112 @@
 <div class="modal fade" id="vacationModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Set Vacation Period</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-calendar-alt me-2"></i>
+                    Set Vacation Period
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <form id="vacationForm">
                     <input type="hidden" id="vacationUsername">
                     <div class="mb-3">
                         <label for="startDate" class="form-label">Start Date</label>
-                        <input type="date" class="form-control" id="startDate" required>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                            <input type="date" class="form-control" id="startDate" required 
+                                   min="{{ today_date }}" onchange="validateDates()">
+                        </div>
+                        <div class="form-text text-muted">Vacation cannot start in the past</div>
                     </div>
                     <div class="mb-3">
                         <label for="endDate" class="form-label">End Date</label>
-                        <input type="date" class="form-control" id="endDate" required>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                            <input type="date" class="form-control" id="endDate" required onchange="validateDates()">
+                        </div>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <span id="vacationLength">Select dates to see vacation duration</span>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" onclick="setVacation()">Set Vacation</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-primary" onclick="setVacation()" id="saveVacationBtn" disabled>
+                    <i class="fas fa-save me-2"></i>Save
+                </button>
             </div>
         </div>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 <script>
+    let calendar;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        const calendarEl = document.getElementById('vacation-calendar');
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek'
+            },
+            events: loadVacations,
+            eventClick: function(info) {
+                if (info.event.extendedProps.canManage) {
+                    if (confirm(`Do you want to clear ${info.event.title}'s vacation?`)) {
+                        clearVacation(info.event.extendedProps.username);
+                    }
+                }
+            },
+            eventDidMount: function(info) {
+                // Add tooltip
+                const tooltip = `${info.event.extendedProps.fullName}\n${info.event.start.toLocaleDateString()} - ${info.event.end.toLocaleDateString()}`;
+                info.el.setAttribute('title', tooltip);
+            }
+        });
+        calendar.render();
+    });
+
+    function loadVacations(info, successCallback, failureCallback) {
+        fetch('/admin/vacations')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const events = data.vacations.map(v => ({
+                        title: v.full_name,
+                        start: v.start_date,
+                        end: v.end_date,
+                        backgroundColor: v.username === '{{ session.username }}' ? '#4e73df' : '#858796',
+                        borderColor: v.username === '{{ session.username }}' ? '#4e73df' : '#858796',
+                        extendedProps: {
+                            username: v.username,
+                            fullName: v.full_name,
+                            canManage: true
+                        }
+                    }));
+                    successCallback(events);
+                } else {
+                    failureCallback(new Error(data.message));
+                }
+            })
+            .catch(error => {
+                console.error('Error loading vacations:', error);
+                failureCallback(error);
+            });
+    }
+
+    function refreshCalendar() {
+        calendar.refetchEvents();
+    }
+
     function approveUser(username) {
         fetch(`/admin/user/${username}/approve`, {
             method: 'POST',
@@ -369,7 +511,52 @@
 
     function showSetVacationModal(username) {
         document.getElementById('vacationUsername').value = username;
+        
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('startDate').min = today;
+        document.getElementById('endDate').min = today;
+        
+        // Reset form
+        document.getElementById('startDate').value = '';
+        document.getElementById('endDate').value = '';
+        document.getElementById('vacationLength').innerHTML = 'Select dates to see vacation duration';
+        document.getElementById('saveVacationBtn').disabled = true;
+        
         vacationModal.show();
+    }
+
+    function validateDates() {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        const saveBtn = document.getElementById('saveVacationBtn');
+        const lengthDisplay = document.getElementById('vacationLength');
+
+        if (startDate && endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (start < today) {
+                lengthDisplay.innerHTML = '<span class="text-danger">Start date cannot be in the past</span>';
+                saveBtn.disabled = true;
+                return;
+            }
+
+            if (end < start) {
+                lengthDisplay.innerHTML = '<span class="text-danger">End date must be after start date</span>';
+                saveBtn.disabled = true;
+                return;
+            }
+
+            const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+            lengthDisplay.innerHTML = `Vacation duration: ${days} day${days !== 1 ? 's' : ''}`;
+            saveBtn.disabled = false;
+        } else {
+            lengthDisplay.innerHTML = 'Select dates to see vacation duration';
+            saveBtn.disabled = true;
+        }
     }
 
     function setVacation() {
@@ -395,36 +582,43 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
+                toastr.success('Vacation period set successfully');
                 vacationModal.hide();
                 window.location.reload();
             } else {
-                alert(data.error || 'Failed to set vacation period');
+                toastr.error(data.message || 'Failed to set vacation period');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Failed to set vacation period');
+            toastr.error('An error occurred while setting the vacation period');
         });
     }
 
     function clearVacation(username) {
-        if (confirm('Are you sure you want to clear the vacation period?')) {
-            fetch(`/admin/user/${username}/clear-vacation`, {
-                method: 'POST'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.reload();
-                } else {
-                    alert(data.error || 'Failed to clear vacation period');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Failed to clear vacation period');
-            });
+        if (!confirm('Are you sure you want to clear this vacation period?')) {
+            return;
         }
+
+        fetch(`/admin/user/${username}/clear-vacation`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                toastr.success('Vacation period cleared successfully');
+                window.location.reload();
+            } else {
+                toastr.error(data.message || 'Failed to clear vacation period');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            toastr.error('An error occurred while clearing the vacation period');
+        });
     }
 </script>
 {% endblock %}

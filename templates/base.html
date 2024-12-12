@@ -3,50 +3,232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}OP Generator{% endblock %}</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{% block title %}OP Number Generator{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+        .content-wrapper {
+            flex: 1 0 auto;
+        }
+        .navbar {
+            background-color: white !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 0.5rem 1rem;
+        }
+        .navbar-brand {
+            color: #4285f4 !important;
+            font-size: 1.5rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .navbar-brand i {
+            color: #4285f4;
+            font-size: 1.8rem;
+        }
+        .nav-link {
+            color: #5f6368 !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+        }
+        .nav-link:hover {
+            color: #4285f4 !important;
+        }
+        .nav-link.active {
+            color: #4285f4 !important;
+        }
+        .user-info {
+            color: #5f6368 !important;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .user-info i {
+            color: #4285f4;
+        }
+        .sign-out-btn {
+            color: #5f6368 !important;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .sign-out-btn:hover {
+            color: #4285f4 !important;
+        }
+        footer {
+            flex-shrink: 0;
+            background-color: #f8f9fa;
+            padding: 1rem 0;
+            border-top: 1px solid #dee2e6;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+        /* Flash message container */
+        #flash-messages {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 600px;
+            z-index: 1050;
+        }
+
+        /* Individual flash message */
+        #flash-messages .alert {
+            background: white;
+            border: none;
+            border-left: 4px solid;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+            padding: 1rem;
+            position: relative;
+            word-break: break-word;
+        }
+
+        /* Success message specific */
+        #flash-messages .alert-success {
+            border-left-color: #28a745;
+            color: #155724;
+        }
+
+        /* Close button */
+        #flash-messages .btn-close {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.5;
+        }
+
+        #flash-messages .btn-close:hover {
+            opacity: 1;
+        }
+
+        /* Icon styling */
+        #flash-messages .alert i {
+            margin-right: 10px;
+        }
+
+        /* Message text container */
+        #flash-messages .alert-content {
+            margin-right: 20px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            #flash-messages {
+                width: 95%;
+                top: 10px;
+            }
+        }
+    </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    {% if session.user_id %}
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="/">OP Generator</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">Home</a>
-                    </li>
-                    {% if session.is_admin %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/admin">Admin Dashboard</a>
-                    </li>
-                    {% endif %}
-                </ul>
-                <div class="navbar-nav">
-                    <span class="nav-item nav-link text-light me-3">
-                        <i class="fas fa-user me-1"></i>
-                        {{ session.full_name }}
-                    </span>
-                    <a class="nav-link" href="/logout">
-                        <i class="fas fa-sign-out-alt me-1"></i>
-                        Sign Out
-                    </a>
-                </div>
-            </div>
-        </div>
-    </nav>
-    {% endif %}
-
-    <div class="container mt-4">
-        {% block content %}{% endblock %}
+    <!-- Flash messages container at the top level -->
+    <div id="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show" role="alert">
+                        <i class="fas fa-{% if category == 'success' %}check-circle{% elif category in ['error', 'danger'] %}exclamation-circle{% elif category == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+                        <div class="alert-content">{{ message }}</div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
     </div>
 
+    <div class="content-wrapper">
+        {% if session.user_id %}
+        <nav class="navbar navbar-expand-lg">
+            <div class="container">
+                <a class="navbar-brand" href="{{ url_for('index') }}">
+                    <i class="fas fa-hashtag"></i>
+                    OP Number Generator
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" href="{{ url_for('index') }}">Home</a>
+                        </li>
+                        {% if session.is_admin %}
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'admin_dashboard' %}active{% endif %}" href="{{ url_for('admin_dashboard') }}">Admin</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'manage_groups' %}active{% endif %}" href="{{ url_for('manage_groups') }}">Groups</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                    <div class="ms-auto d-flex align-items-center">
+                      <!--  {% if session.is_admin %}
+                      //  <div class="user-info me-4">
+                      //      <i class="fas fa-user-shield"></i>
+                            Administrator
+                        </div>
+                        {% endif %}
+						----->
+                        <div class="user-info me-4">
+                            <i class="fas fa-user"></i>
+                            {{ user_fullname() }}
+                        </div>
+                        <a href="{{ url_for('change_password') }}" class="sign-out-btn me-3">
+                            <i class="fas fa-key"></i>
+                            Change Password
+                        </a>
+                        <a href="{{ url_for('logout') }}" class="sign-out-btn">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Sign Out
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        {% endif %}
+
+        <div class="container mt-4">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p class="mb-0">&copy; {{ current_year }} OP Number Generator. All rights reserved.</p>
+        </div>
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-hide flash messages after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                var alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function(alert) {
+                    var bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                });
+            }, 5000);
+        });
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>
